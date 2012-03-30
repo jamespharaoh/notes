@@ -12,7 +12,9 @@
 	stop/0,
 
 	add_quick_note/2,
+	get_quick_note/2,
 	get_quick_notes/1,
+	set_quick_note/3,
 
 	% callbacks
 
@@ -52,6 +54,18 @@ get_quick_notes (WorkspaceId) ->
 		data,
 		{ get_quick_notes, WorkspaceId }).
 
+get_quick_note (WorkspaceId, NoteId) ->
+
+	gen_server:call (
+		data,
+		{ get_quick_note, WorkspaceId, NoteId }).
+
+set_quick_note (WorkspaceId, NoteId, Text) ->
+
+	gen_server:call (
+		data,
+		{ set_quick_note, WorkspaceId, NoteId, Text }).
+
 % callbacks
 
 init ([]) ->
@@ -87,6 +101,53 @@ handle_call ({ get_quick_notes, WorkspaceId }, _From, State0) ->
 	Ret = { ok, Notes },
 
 	{ reply, Ret, State1 };
+
+handle_call ({ get_quick_note, WorkspaceId, NoteId }, _From, State0) ->
+
+	{ ok, Notes, State1 } =
+		get_notes (WorkspaceId, State0),
+
+	Ret = case lists:keyfind (NoteId, #note.note_id, Notes) of
+
+		false ->
+			not_found;
+
+		Note ->
+			{ ok, Note }
+
+		end,
+
+	{ reply, Ret, State1 };
+
+handle_call ({ set_quick_note, WorkspaceId, NoteId, Text }, _From, State0) ->
+
+	{ ok, Notes0, State1 } =
+		get_notes (WorkspaceId, State0),
+
+	case lists:keyfind (NoteId, #note.note_id, Notes0) of
+
+		false ->
+			{ reply, not_found, State1 };
+
+		Note0 ->
+
+			Note1 = Note0#note {
+				text = Text },
+
+			Notes1 =
+				lists:keystore (
+					NoteId,
+					#note.note_id,
+					Notes0,
+					Note1),
+
+			State2 = set_notes (WorkspaceId, Notes1, State0),
+
+			Ret = { ok, Note1 },
+
+			{ reply, Ret, State2 }
+
+		end;
 
 handle_call (_Request, _From, _State) ->
 
@@ -129,10 +190,15 @@ read_notes (WorkspaceId) ->
 
 	Filename = [ "data/", WorkspaceId, "/notes" ],
 
-	{ ok, Notes } =
-		file:consult (Filename),
+	case file:consult (Filename) of
 
-	{ ok, Notes }.
+		{ ok, Notes } ->
+			{ ok, Notes };
+
+		{ error, enoent } ->
+			{ ok, [] }
+
+	end.
 
 write_notes (WorkspaceId, Notes) ->
 
@@ -165,4 +231,6 @@ random_str (Len, Chars) ->
 
 random_char (Chars) ->
 
-	element (random:uniform (tuple_size (Chars)), Chars).
+	element (
+		1 + crypto:rand_uniform (0, tuple_size (Chars)),
+		Chars).

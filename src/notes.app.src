@@ -1,20 +1,27 @@
 { application, notes, [
-	{ description, "Notes"},
+
+	{ description, "Notes" },
+
 	{ vsn, "1" },
+
 	{ applications, [
 		kernel,
-		stdlib
-	] },
+		stdlib ] },
+
 	{ registered, [] },
+
 	{ mod, { notes_app, [] } },
+
 	{ env, [
 		{ bind_address, "0.0.0.0" },
 		{ port, 8000 },
 		{ server_name, notes },
-		{ document_root, "./static" }
-	] },
+		{ document_root, "./static" } ] },
+
 	{ modules, [
+		data,
 		notes_app,
-		notes_sup
-	] }
+		notes_sup,
+		workspace ] }
+
 ] }.

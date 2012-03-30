@@ -14,7 +14,7 @@ start_link () ->
 	supervisor:start_link (
 		{ local, ?MODULE },
 		?MODULE,
-		[]).
+		[ ]).
 
 %% ======================================================== supervisor callbacks
 
@@ -37,16 +37,6 @@ init ([]) ->
 	{ ok, ServerName } =
 		application:get_env (server_name),
 
-	{ ok, DocRoot } =
-		application:get_env (document_root),
-
-	io:format (
-		"Starting Mochiweb Server (~s) on ~s:~p, root: '~s'~n", [
-			ServerName,
-			BindAddress,
-			Port,
-			DocRoot ]),
-
 	Options = [
 		{ name, ServerName },
 		{ ip, BindAddress },
@@ -56,7 +46,26 @@ init ([]) ->
 
 	mochiweb_http:start (Options),
 
-	{ ok, { { one_for_one, 5, 10 }, [] } }.
+	% and return
+
+	MaxRestart = 5,
+	MaxTime = 100,
+	RestartPolicy = { one_for_one, MaxRestart, MaxTime },
+
+	ChildSpecs = [
+		{
+			data,
+			{ data, start_link, [] },
+			permanent,
+			10000,
+			worker,
+			[ data ]
+		}
+	],
+
+	SupervisorOptions = { RestartPolicy, ChildSpecs },
+
+	{ ok, SupervisorOptions }.
 
 loop (Req) ->
 

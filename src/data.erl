@@ -15,6 +15,7 @@
 	get_quick_note/2,
 	get_quick_notes/1,
 	set_quick_note/3,
+	delete_quick_note/2,
 
 	% callbacks
 
@@ -65,6 +66,12 @@ set_quick_note (WorkspaceId, NoteId, Text) ->
 	gen_server:call (
 		data,
 		{ set_quick_note, WorkspaceId, NoteId, Text }).
+
+delete_quick_note (WorkspaceId, NoteId) ->
+
+	gen_server:call (
+		data,
+		{ delete_quick_note, WorkspaceId, NoteId }).
 
 % callbacks
 
@@ -142,6 +149,33 @@ handle_call ({ set_quick_note, WorkspaceId, NoteId, Text }, _From, State0) ->
 					Note1),
 
 			State2 = set_notes (WorkspaceId, Notes1, State0),
+
+			Ret = { ok, Note1 },
+
+			{ reply, Ret, State2 }
+
+		end;
+
+handle_call ({ delete_quick_note, WorkspaceId, NoteId }, _From, State0) ->
+
+	{ ok, Notes0, State1 } =
+		get_notes (WorkspaceId, State0),
+
+	case lists:keytake (NoteId, #note.note_id, Notes0) of
+
+		false ->
+
+			Ret = not_found,
+
+			{ reply, Ret, State1 };
+
+		{ value, Note1, Notes1 } ->
+
+			State2 =
+				set_notes (
+					WorkspaceId,
+					Notes1,
+					State1),
 
 			Ret = { ok, Note1 },
 

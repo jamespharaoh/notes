@@ -66,18 +66,25 @@ layout_view_quick_note (Note, PanelId) ->
 
 	#p { body = [
 
-		#literal {
-			text = Note#note.text },
+		#literal { text = Note#note.text },
 
-		#literal {
-			text = " " },
+		#literal { text = " " },
 
 		#link {
 			text = "edit",
 			postback = {
 				start_edit,
 				PanelId,
-				Note#note.note_id } }
+				Note#note.note_id } },
+
+		#literal { text = " " },
+
+		#link {
+			text = "delete",
+			postback = {
+				delete,
+				Note#note.note_id,
+				PanelId } }
 	] }.
 
 layout_edit_quick_note (Note, PanelId) ->
@@ -126,6 +133,15 @@ event ({ start_edit, PanelId, NoteId }) ->
 		layout_edit_quick_note (
 			Note,
 			PanelId));
+
+event ({ delete, NoteId, PanelId }) ->
+
+	{ ok, _Note } =
+		data:delete_quick_note (
+			workspace_id (),
+			NoteId),
+
+	wf:remove (PanelId);
 
 event ({ edit_quick_ok, NoteId, PanelId, TextId }) ->
 

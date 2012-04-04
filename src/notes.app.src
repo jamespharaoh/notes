@@ -6,7 +6,8 @@
 
 	{ applications, [
 		kernel,
-		stdlib ] },
+		stdlib
+	] },
 
 	{ registered, [] },
 
@@ -16,12 +17,22 @@
 		{ bind_address, "0.0.0.0" },
 		{ port, 8000 },
 		{ server_name, notes },
-		{ document_root, "./static" } ] },
+		{ document_root, "./static" },
+		{ base_url, "http://localhost:8000/" }
+	] },
 
 	{ modules, [
+
+		index,
+		workspace,
+
+		user_data,
+		workspace_data,
+
 		data,
+		misc,
 		notes_app,
-		notes_sup,
-		workspace ] }
+		notes_sup
+	] }
 
 ] }.

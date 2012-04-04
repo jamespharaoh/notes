@@ -44,7 +44,15 @@ init ([]) ->
 		{ loop, fun ?MODULE:loop/1 }
 	],
 
-	mochiweb_http:start (Options),
+	{ ok, _MochiPid } = mochiweb_http:start (Options),
+
+	% start openid
+
+	ok = application:start (crypto),
+	ok = application:start (ibrowse),
+	ok = application:start (openid),
+	ok = application:start (public_key),
+	ok = application:start (ssl),
 
 	% and return
 
@@ -53,14 +61,20 @@ init ([]) ->
 	RestartPolicy = { one_for_one, MaxRestart, MaxTime },
 
 	ChildSpecs = [
-		{
-			data,
-			{ data, start_link, [] },
+
+		%{	data,
+		%	{ data, start_link, [] },
+		%	permanent,
+		%	10000,
+		%	worker,
+		%	[ data ] },
+
+		{	openid,
+			{ openid_srv, start_link, [ openid ] },
 			permanent,
 			10000,
 			worker,
-			[ data ]
-		}
+			[ openid ] }
 	],
 
 	SupervisorOptions = { RestartPolicy, ChildSpecs },

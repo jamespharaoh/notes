@@ -14,14 +14,23 @@ title () ->
 
 layout () ->
 
-	[	#h1 { text = "Home" },
+	case wf:user () of
 
-		layout_add_quick_note (),
+		undefined ->
 
-		#panel {
-			id = quick_notes,
-			body = layout_view_quick_notes () }
-	].
+			wf:redirect ("/");
+
+		_ ->
+
+			[	#h1 { text = "Workspace" },
+
+				layout_add_quick_note (),
+
+				#panel {
+					id = quick_notes,
+					body = layout_view_quick_notes () }
+			]
+		end.
 
 layout_add_quick_note () ->
 
@@ -41,18 +50,27 @@ layout_add_quick_note () ->
 
 layout_view_quick_notes () ->
 
-	{ ok, Notes } =
-		data:get_quick_notes (workspace_id ()),
+	case workspace_data:get_notes (
+			workspace_id (),
+			wf:user ()) of
 
-	[	#hr { },
+		permission_denied ->
 
-		#h2 {
-			text = "Quick notes waiting to be processed" },
+			wf:redirect ("/");
 
-		lists:map (
-			fun layout_one_quick_note/1,
-			Notes)
-	].
+		{ ok, Notes } ->
+
+			[	#hr { },
+
+				#h2 {
+					text = "Quick notes waiting to be processed" },
+
+				lists:map (
+					fun layout_one_quick_note/1,
+					Notes)
+			]
+
+		end.
 
 layout_one_quick_note (Note) ->
 
@@ -66,7 +84,7 @@ layout_view_quick_note (Note, PanelId) ->
 
 	#p { body = [
 
-		#literal { text = Note#note.text },
+		#literal { text = Note#workspace_note.text },
 
 		#literal { text = " " },
 
@@ -75,7 +93,7 @@ layout_view_quick_note (Note, PanelId) ->
 			postback = {
 				start_edit,
 				PanelId,
-				Note#note.note_id } },
+				Note#workspace_note.note_id } },
 
 		#literal { text = " " },
 
@@ -83,7 +101,7 @@ layout_view_quick_note (Note, PanelId) ->
 			text = "delete",
 			postback = {
 				delete,
-				Note#note.note_id,
+				Note#workspace_note.note_id,
 				PanelId } }
 	] }.
 
@@ -93,13 +111,13 @@ layout_edit_quick_note (Note, PanelId) ->
 
 	[	#textarea {
 			id = TextId,
-			text = Note#note.text },
+			text = Note#workspace_note.text },
 
 		#button {
 			text = "Ok",
 			postback = {
 				edit_quick_ok,
-				Note#note.note_id,
+				Note#workspace_note.note_id,
 				PanelId,
 				TextId } }
 	].
@@ -109,13 +127,10 @@ event (add_quick_ok) ->
 	Text =
 		wf:q (add_quick_text),
 
-	data:add_quick_note (
+	workspace_data:add_note (
 		workspace_id (),
+		wf:user (),
 		Text),
-
-	% TODO why does this not work?
-	wf:flash (
-		#p { body = "Quick note added" }),
 
 	wf:update (
 		quick_notes,
@@ -124,8 +139,9 @@ event (add_quick_ok) ->
 event ({ start_edit, PanelId, NoteId }) ->
 
 	{ ok, Note } =
-		data:get_quick_note (
+		workspace_data:get_note (
 			workspace_id (),
+			wf:user (),
 			NoteId),
 
 	wf:update (
@@ -137,8 +153,9 @@ event ({ start_edit, PanelId, NoteId }) ->
 event ({ delete, NoteId, PanelId }) ->
 
 	{ ok, _Note } =
-		data:delete_quick_note (
+		workspace_data:delete_note (
 			workspace_id (),
+			wf:user (),
 			NoteId),
 
 	wf:remove (PanelId);
@@ -148,8 +165,9 @@ event ({ edit_quick_ok, NoteId, PanelId, TextId }) ->
 	Text = wf:q (TextId),
 
 	{ ok, Note } =
-		data:set_quick_note (
+		workspace_data:set_note (
 			workspace_id (),
+			wf:user (),
 			NoteId,
 			Text),
 

@@ -1,4 +1,8 @@
+/.eunit
 /data
 /deps
 /ebin
+/notes.config
 /static/nitrogen
+*.dump
+*.beam

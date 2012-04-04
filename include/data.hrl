@@ -10,6 +10,11 @@
 	user_id,
 	roles }).
 
+-record (workspace_state, {
+	workspace_id,
+	perms = [],
+	notes = [] }).
+
 -record (user_workspace, {
 	workspace_id,
 	name }).

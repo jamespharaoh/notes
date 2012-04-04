@@ -136,7 +136,7 @@ write (State, Name, Value) ->
 
 full_name (State, Name) ->
 
-	[	"data/users/",
+	[	"users/",
 		misc:sha1 (State#state.user_id),
 		"/",
 		Name ].

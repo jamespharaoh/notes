@@ -1,30 +1,59 @@
 -module (data).
 
 -export ([
-
 	read/1,
 	write/2 ]).
+
+-ifdef (TEST).
+
+full_path (Path) ->
+	[ "test/", Path ].
+
+-else.
+
+full_path (Path) ->
+	[ "data/", Path ].
+
+-endif.
 
 % public api
 
 read (Path) ->
 
-	case file:consult (Path) of
+	FullPath = full_path (Path),
+
+	% read records
+
+	case file:consult (FullPath) of
 
 		{ ok, Records } ->
+
+			% return
+
 			{ ok, Records };
 
 		{ error, enoent } ->
+
+			% not found, return empty
+
 			{ ok, [] }
 
 	end.
 
 write (Path, Records) ->
 
-	filelib:ensure_dir (Path),
+	FullPath = full_path (Path),
+
+	% make sure directory exists
+
+	filelib:ensure_dir (FullPath),
+
+	% open file
 
 	{ ok, IoDevice } =
-		file:open (Path, [ write ]),
+		file:open (FullPath, [ write ]),
+
+	% write records
 
 	lists:foreach (
 
@@ -34,6 +63,10 @@ write (Path, Records) ->
 
 		Records),
 
+	% close file
+
 	file:close (IoDevice),
+
+	% return
 
 	ok.

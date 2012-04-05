@@ -18,15 +18,25 @@ end
 STRING_RE = /"([^"]*)"/
 
 def driver
-	return @the_driver if @the_driver
-	@the_driver = Selenium::WebDriver.for :firefox
-	return @the_driver
-end
 
-After do
-	if @the_driver then
-		@the_driver.close
+	# return if ready now
+	return @the_driver if @the_driver
+
+	# initialise long running driver
+	unless $the_driver
+		$the_driver = Selenium::WebDriver.for :firefox
+		at_exit do
+			@the_driver.close
+		end
 	end
+	the_driver = $the_driver
+
+	# clear state
+	the_driver.manage.delete_all_cookies
+	the_driver.get "about:blank"
+
+	# and return
+	return @the_driver = the_driver
 end
 
 # given

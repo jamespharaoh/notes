@@ -71,15 +71,22 @@ layout () ->
 
 layout_not_authenticated () ->
 
-	[	#h1 { text = "Notes - Please log in" },
+	[	#panel {
+			id = "login_form",
+			body = [
 
-		#textbox {
-			id = openid_url,
-			text = "https://www.google.com/accounts/o8/id" },
+				#h1 { text = "Notes - Please log in" },
 
-		#button {
-			text = "Ok",
-			postback = login }
+				#textbox {
+					id = openid_url,
+					text = "https://www.google.com/accounts/o8/id" },
+
+				#button {
+					id = ok_button,
+					text = "Ok",
+					postback = login }
+
+			] }
 	].
 
 layout_authenticated () ->

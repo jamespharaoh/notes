@@ -3,9 +3,16 @@ Feature: Login
   As a user
   I need to be able to log in
 
-  Scenario: Login form displays
+  Scenario: Need to log in
+
     When I open the home page
-    Then the "login form" should be displayed
-    And it should have the following fields:
-      | name       | value                                 |
-      | openid_url | https://www.google.com/accounts/o8/id |
+
+    Then I should not be logged in
+    And the "login form" should be displayed
+
+  Scenario: Successful login
+
+    When I log in via openid
+
+    Then I should be on the home page
+    And I should be logged in

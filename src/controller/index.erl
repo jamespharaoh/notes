@@ -18,6 +18,18 @@ main () ->
 
 	end.
 
+body_class () ->
+
+	case wf:user () of
+
+		undefined ->
+			"not_logged_in";
+
+		_ ->
+			"logged_in"
+
+	end.
+
 do_login () ->
 
 	{ ok, BaseUrl } =

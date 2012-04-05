@@ -178,7 +178,7 @@ handle_call_add_note_success_test () ->
 
 	?EXPECT,
 
-		em:strict (Em, misc, random_id, [ ],
+		em:strict (Em, random, random_id, [ ],
 			{ return, "note_id" }),
 
 		em:strict (Em, data, write,

@@ -18,3 +18,7 @@
 -record (user_workspace, {
 	workspace_id,
 	name }).
+
+-record (user_state, {
+	user_id,
+	workspaces = [] }).

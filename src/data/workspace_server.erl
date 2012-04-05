@@ -94,7 +94,7 @@ handle_call ({ add_note, UserId, Text }, _From, State0) ->
 			% add note
 
 			Note = #workspace_note {
-				note_id = misc:random_id (),
+				note_id = random:random_id (),
 				text = Text },
 
 			Notes = [ Note | State0#workspace_state.notes ],

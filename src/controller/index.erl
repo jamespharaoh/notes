@@ -46,7 +46,7 @@ session_id () ->
 
 		undefined ->
 
-			SessionId = misc:random_id (),
+			SessionId = random:random_id (),
 
 			wf:session (session_id, SessionId),
 
@@ -163,8 +163,6 @@ event (login) ->
 
 	{ ok, BaseUrl } =
 		application:get_env (base_url),
-
-io:format ("base url is ~p~n", [ BaseUrl ]),
 
 	ReturnTo = BaseUrl,
 	Realm = BaseUrl,

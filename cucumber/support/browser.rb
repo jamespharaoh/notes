@@ -34,22 +34,36 @@ I = / (?: I\s | )?/x
 def driver
 
 	# return if ready now
+
 	return @the_driver if @the_driver
 
 	# initialise long running driver
+
 	unless $the_driver
+
 		$the_driver = Selenium::WebDriver.for :firefox
+
+		#$the_driver =
+		#	Selenium::WebDriver.for(
+		#		:remote,
+		#		:url => "http://localhost:4444/wd/hub",
+		#		:desired_capabilities =>
+		#			Selenium::WebDriver::Remote::Capabilities.htmlunit(
+		#				:javascript_enabled => true))
+
 		at_exit do
-			@the_driver.close
+			$the_driver.close
 		end
 	end
 	the_driver = $the_driver
 
 	# clear state
+
 	the_driver.manage.delete_all_cookies
 	the_driver.get "about:blank"
 
 	# and return
+
 	return @the_driver = the_driver
 end
 

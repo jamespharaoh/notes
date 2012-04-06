@@ -83,8 +83,11 @@ layout () ->
 
 layout_not_authenticated () ->
 
+	FormId = wf:temp_id (),
+
 	[	#panel {
-			id = "login_form",
+			id = FormId,
+			class = login_form,
 			body = [
 
 				#h1 { text = "Notes - Please log in" },
@@ -94,16 +97,16 @@ layout_not_authenticated () ->
 					text = "https://www.google.com/accounts/o8/id" },
 
 				#button {
-					id = ok_button,
+					class = ok_button,
 					text = "Ok",
-					postback = login }
+					postback = { login, FormId } }
 
 			] }
 	].
 
 layout_authenticated () ->
 
-	WorkspaceNameId = wf:temp_id (),
+	FormId = wf:temp_id (),
 
 	{ ok, Workspaces } =
 		user_data:get_workspaces (wf:user ()),
@@ -114,19 +117,29 @@ layout_authenticated () ->
 
 		#h2 { text = "Create new workspace" },
 
-		#p { body = [
+		#panel {
+			id = FormId,
+			class = create_workspace_form,
+			body = [
 
-			#label { text = "Name" },
+				#p { body = [
 
-			#textbox { id = WorkspaceNameId }
-		] },
+					#label {
+						text = "Name" },
 
-		#p { body = [
+					#textbox {
+						id = workspace_name }
+				] },
 
-			#button {
-				text = "Create workspace",
-				postback = { create_workspace, WorkspaceNameId } }
-		] },
+				#p { body = [
+
+					#button {
+						id = create_workspace_button,
+						text = "Create workspace",
+						postback = { create_workspace, FormId } }
+				] }
+
+			] },
 
 		#hr {},
 
@@ -150,9 +163,10 @@ layout_authenticated () ->
 			Workspaces)
 	].
 
-event ({ create_workspace, WorkspaceNameId }) ->
+event ({ create_workspace, FormId }) ->
 
-	WorkspaceName = wf:q (WorkspaceNameId),
+	WorkspaceName =
+		wf:q (FormId ++ ".workspace_name"),
 
 	{ ok, Workspace } =
 		user_data:create_workspace (
@@ -168,10 +182,10 @@ event ({ create_workspace, WorkspaceNameId }) ->
 		"workspace/",
 		Workspace#user_workspace.workspace_id ]);
 
-event (login) ->
+event ({ login, FormId }) ->
 
 	OpenIdUrl =
-		wf:q (openid_url),
+		wf:q (FormId ++ ".openid_url"),
 
 	SessionId = session_id (),
 

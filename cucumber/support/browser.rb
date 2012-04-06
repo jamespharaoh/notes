@@ -5,6 +5,10 @@ require "selenium-webdriver"
 
 $url = "http://localhost:8000"
 
+def usid name
+	return name.gsub(" ", "_")
+end
+
 def wfid name
 	return "wfid_" + name.gsub(" ", "_")
 end
@@ -15,9 +19,17 @@ def simple_url
 	return url
 end
 
+def local_url
+	unless simple_url =~ /^#{Regexp.quote $url}(\/.+)$/
+		raise "Not a local url"
+	end
+	return $1
+end
+
 STRING_RE = /"([^"]*)"/
 
 I_HAVE = / (?: I\shave\s | I\sam\s | have\s | am\s | )?/x
+I = / (?: I\s | )?/x
 
 def driver
 
@@ -41,15 +53,43 @@ def driver
 	return @the_driver = the_driver
 end
 
+def find_element name
+
+	# search under our context element first
+
+	begin
+		if @element
+
+			elements = @element.find_elements(:class_name, wfid(name)) \
+				+ @element.find_elements(:class_name, usid(name))
+			raise "Multiple matches for #{name}" if elements.size > 1
+			return elements[0] unless elements.empty?
+
+		end
+	rescue Selenium::WebDriver::Error::StaleElementReferenceError
+		@element = nil
+	end
+
+	# then try a page wide search
+
+	elements = driver.find_elements(:class_name, wfid(name)) \
+		+ driver.find_elements(:class_name, usid(name))
+	raise "Multiple matches for #{name}" if elements.size > 1
+	return elements[0] unless elements.empty?
+
+	# raise an error
+
+	raise "Can't find element: #{name}"
+end
+
 # given
 
 Given /^#{I_HAVE}opened the home page$/ do
 	driver.get "#{$url}/"
 end
 
-Given /^#{I_HAVE}located the #{STRING_RE}/ do |id|
-	@element = driver.find_element :class_name, wfid(id)
-	@element.should_not be_nil
+Given /^#{I_HAVE}located the #{STRING_RE}/ do |name|
+	@element = find_element name
 end
 
 Given /^#{I_HAVE}logged in$/ do
@@ -58,57 +98,36 @@ end
 
 # when
 
-When /^(?:I )?open the home page$/ do
+When /^#{I}open the home page$/ do
 	driver.get "#{$url}/"
 end
 
-Given /^(?:I )?locate the #{STRING_RE}/ do |id|
-	@element = driver.find_element :class_name, wfid(id)
-	@element.should_not be_nil
+Given /^#{I}locate the #{STRING_RE}/ do |name|
+	@element = find_element name
 end
 
-def find_element name
-
-	# search under our context element first
-
-	begin
-		if @element
-			elements = @element.find_elements :class_name, wfid(name)
-			raise "Multiple matches" if elements.size > 1
-			return elements[0] unless elements.empty?
-		end
-	rescue Selenium::WebDriver::Error::StaleElementReferenceError
-		@element = nil
-	end
-
-	# then try a page wide search
-
-	elements = driver.find_elements :class_name, wfid(name)
-	raise "Multiple matches" if elements.size > 1
-	return elements[0] unless elements.empty?
-
-	# raise an error
-
-	raise "Can't find element: #{name}"
-end
-
-When /^(?:I )?click the #{STRING_RE}$/ do |name|
+When /^#{I}click the #{STRING_RE}$/ do |name|
 	button = find_element name
 	button.click
 end
 
-When /^(?:I )?fill in the following fields:$/ do |table|
+When /^I enter #{STRING_RE} in #{STRING_RE}$/ do |value, name|
+	field = find_element name
+	field.send_keys [ :control, "a" ]
+	field.send_keys value
+end
+
+When /^#{I}fill in the following fields:$/ do |table|
 	table.hashes.each do |hash|
 		name = hash["name"]
 		value = hash["value"]
-		field = @element.find_element :class_name, wfid(name)
-		field.should_not be_nil
+		field = find_element name
 		field.send_keys [ :control, "a" ]
 		field.send_keys value
 	end
 end
 
-When /^(?:I )?log in via openid$/ do
+When /^#{I}log in via openid$/ do
 
 	step "open the home page"
 	step "locate the \"login form\""
@@ -143,24 +162,22 @@ When /^(?:I )?log in via openid$/ do
 
 end
 
-When /^I log out$/ do
-	button = driver.find_element :class, "logout_button"
+When /^#{I}log out$/ do
+	button = find_element "logout_button"
 	button.click
 end
 
 # then
 
 Then /^the #{STRING_RE} should be displayed$/ do |name|
-	@element = driver.find_element :class_name, wfid(name)
-	@element.should_not be_nil
+	@element = find_element name
 end
 
 Then /^it should have the following fields:$/ do |table|
 	table.hashes.each do |hash|
 		name = hash["name"]
 		expect = hash["value"]
-		field = @element.find_element :class_name, wfid(name)
-		field.should_not be_nil
+		field = find_element name
 		actual = field.attribute("value")
 		actual.should eq(expect)
 	end
@@ -172,15 +189,18 @@ Then /^the location should be #{STRING_RE}$/ do |url|
 end
 
 Then /^I should be logged in$/ do
-	body = driver.find_element :class, "logged_in"
-	body.should_not be_nil
+	find_element "logged_in"
 end
 
 Then /^I should not be logged in$/ do
-	body = driver.find_element :class, "not_logged_in"
-	body.should_not be_nil
+	find_element "not_logged_in"
 end
 
 Then /^I should be on the home page$/ do
 	step "the location should be \"/\""
+end
+
+Then /^I should be on the workspace page for #{STRING_RE}$/ do |workspace_name|
+	local_url.should match(/^ \/ workspace \/ ([a-z]{16}) $/x)
+	# TODO check name!
 end

@@ -1,4 +1,4 @@
-Feature: Login
+Feature: Log out
   To prevent access to my data, or log in again
   As a user
   I need to be able to log out

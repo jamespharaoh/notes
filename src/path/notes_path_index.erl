@@ -8,8 +8,6 @@
 
 main () ->
 
-io:format ("LOGGED IN: ~s~n", [ wf:user () ]),
-
 	case wf:q ("openid.ns") of
 
 		undefined ->
@@ -37,7 +35,7 @@ do_login () ->
 	{ ok, BaseUrl } =
 		application:get_env (base_url),
 
-	SessionId = session_id (),
+	SessionId = notes_wf:session_id (),
 	ReturnTo = BaseUrl,
 
 	Params = wf:params (),
@@ -54,23 +52,6 @@ do_login () ->
 title () ->
 	"Notes".
 
-session_id () ->
-
-	case wf:session (session_id) of
-
-		undefined ->
-
-			SessionId = notes_random:random_id (),
-
-			wf:session (session_id, SessionId),
-
-			SessionId;
-
-		SessionId ->
-
-			SessionId
-	end.
-
 layout () ->
 
 	case wf:user () of
@@ -85,128 +66,17 @@ layout () ->
 
 layout_not_authenticated () ->
 
-	FormId = wf:temp_id (),
-
-	[	#panel {
-			id = FormId,
-			class = login_form,
-			body = [
-
-				#h1 { text = "Notes - Please log in" },
-
-				#textbox {
-					id = openid_url,
-					text = "https://www.google.com/accounts/o8/id" },
-
-				#button {
-					class = ok_button,
-					text = "Ok",
-					postback = { login, FormId } }
-
-			] }
-	].
+	[ notes_layout_login:layout () ].
 
 layout_authenticated () ->
-
-	FormId = wf:temp_id (),
-
-	{ ok, Workspaces } =
-		notes_data_user:get_workspaces (wf:user ()),
 
 	[	#h1 { text = "Notes - Main menu" },
 
 		#hr {},
 
-		#h2 { text = "Create new workspace" },
-
-		#panel {
-			id = FormId,
-			class = create_workspace_form,
-			body = [
-
-				#p { body = [
-
-					#label {
-						text = "Name" },
-
-					#textbox {
-						id = workspace_name }
-				] },
-
-				#p { body = [
-
-					#button {
-						id = create_workspace_button,
-						text = "Create workspace",
-						postback = { create_workspace, FormId } }
-				] }
-
-			] },
+		notes_layout_workspace_create:layout (),
 
 		#hr {},
 
-		#h2 { text = "Your workspaces" },
-
-		lists:map (
-
-			fun (Workspace) ->
-
-				#p { body = [
-
-					#link {
-						text = Workspace#user_workspace.name,
-						url = [
-							"workspace/",
-							Workspace#user_workspace.workspace_id ] }
-				] }
-
-				end,
-
-			Workspaces)
+		notes_layout_workspace_list:layout ()
 	].
-
-event ({ create_workspace, FormId }) ->
-
-	WorkspaceName =
-		wf:q (FormId ++ ".workspace_name"),
-
-	{ ok, Workspace } =
-		notes_data_user:create_workspace (
-			wf:user (),
-			WorkspaceName),
-
-	ok =
-		notes_data_workspace:create (
-			Workspace#user_workspace.workspace_id,
-			wf:user (),
-			WorkspaceName),
-
-	wf:redirect ([
-		"workspace/",
-		Workspace#user_workspace.workspace_id ]);
-
-event ({ login, FormId }) ->
-
-	OpenIdUrl =
-		wf:q (FormId ++ ".openid_url"),
-
-	SessionId = session_id (),
-
-	{ ok, AuthReq } =
-		gen_server:call (
-			openid,
-			{ prepare, SessionId, OpenIdUrl, true }),
-
-	{ ok, BaseUrl } =
-		application:get_env (base_url),
-
-	ReturnTo = BaseUrl,
-	Realm = BaseUrl,
-
-	AuthUrl =
-		openid:authentication_url (
-			AuthReq,
-			ReturnTo,
-			Realm),
-
-	wf:redirect (AuthUrl).

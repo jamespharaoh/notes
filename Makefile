@@ -24,6 +24,9 @@ erl: compile
 clean: rebar
 	./rebar clean
 
+cleaner: clean
+	rm -rf .bundle bundle deps rebar
+
 rebar:
 	wget https://github.com/downloads/basho/rebar/rebar
 	chmod +x rebar
@@ -33,7 +36,7 @@ tests: eunit cucumber
 eunit:
 	./rebar eunit skip_deps=true
 
-cucumber:
+cucumber: bundle
 	bundle exec cucumber
 
 bundle:

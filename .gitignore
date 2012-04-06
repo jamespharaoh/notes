@@ -1,8 +1,11 @@
+/.bundle
 /.eunit
+/bundle
 /data
 /deps
 /ebin
 /notes.config
+/rebar
 /static/nitrogen
 *.dump
 *.beam

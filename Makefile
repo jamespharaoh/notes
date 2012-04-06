@@ -1,11 +1,11 @@
 
 default: compile
 
-get-deps:
-	rebar get-deps
+get-deps: rebar
+	./rebar get-deps
 
-compile: get-deps
-	rebar compile
+compile: rebar get-deps
+	./rebar compile
 	rsync --recursive --delete deps/nitrogen_core/www/ static/nitrogen/
 
 run: compile
@@ -21,5 +21,20 @@ erl: compile
 		-pa ebin deps/*/ebin deps/*/include \
 		-name notes@127.0.0.1
 
-clean:
-	rebar clean
+clean: rebar
+	./rebar clean
+
+rebar:
+	wget https://github.com/downloads/basho/rebar/rebar
+	chmod +x rebar
+
+tests: eunit cucumber
+
+eunit:
+	./rebar eunit skip_deps=true
+
+cucumber:
+	bundle exec cucumber
+
+bundle:
+	bundle install --path bundle

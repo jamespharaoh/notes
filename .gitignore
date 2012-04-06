@@ -1,4 +1,6 @@
 /.bundle
+/.bundle-flag
+/.deps-flag
 /.eunit
 /bundle
 /data

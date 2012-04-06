@@ -174,9 +174,10 @@ event ({ create_workspace, FormId }) ->
 			WorkspaceName),
 
 	ok =
-		workspace_data:set_owner (
+		workspace_data:create (
 			Workspace#user_workspace.workspace_id,
-			wf:user ()),
+			wf:user (),
+			WorkspaceName),
 
 	wf:redirect ([
 		"workspace/",

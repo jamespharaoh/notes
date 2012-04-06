@@ -5,6 +5,7 @@
 	% public api
 
 	create/3,
+	get_workspace/2,
 
 	add_note/3,
 	delete_note/3,
@@ -22,6 +23,11 @@ create (WorkspaceId, UserId, Name) ->
 
 	gen_server:call (get_pid (WorkspaceId),
 		{ create, UserId, Name }).
+
+get_workspace (WorkspaceId, UserId) ->
+
+	gen_server:call (get_pid (WorkspaceId),
+		{ get_workspace, UserId }).
 
 % public api - notes
 

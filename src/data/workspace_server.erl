@@ -94,6 +94,30 @@ handle_call ({ create, UserId, Name }, _From, State0) ->
 
 		end;
 
+handle_call ({ get_workspace, UserId }, _From, State) ->
+
+	% check permissions
+
+	case check_perms (State, UserId, [ owner, read ]) of
+
+		false ->
+
+			% return error
+
+			Ret = permission_denied,
+
+			{ reply, Ret, State };
+
+		true ->
+
+			% return workspace
+
+			Ret = { ok, State #workspace_state.workspace  },
+
+			{ reply, Ret, State }
+
+		end;
+
 handle_call ({ add_note, UserId, Text }, _From, State0) ->
 
 	% check permissions

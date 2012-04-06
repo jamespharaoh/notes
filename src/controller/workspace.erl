@@ -7,12 +7,6 @@
 -compile (export_all).
 
 main () ->
-	#template { file = "./templates/page.html" }.
-
-title () ->
-	"Notes".
-
-layout () ->
 
 	case wf:user () of
 
@@ -22,15 +16,47 @@ layout () ->
 
 		_ ->
 
-			[	#h1 { text = "Workspace" },
+			% load workspace
 
-				layout_add_quick_note (),
+			{ ok, Workspace } =
+				workspace_data:get_workspace (
+					workspace_id (),
+					wf:user ()),
 
-				#panel {
-					id = quick_notes,
-					body = layout_view_quick_notes () }
-			]
+			wf:state (workspace, Workspace),
+
+			% load notes
+
+			{ ok, Notes } =
+				workspace_data:get_notes (
+					workspace_id (),
+					wf:user ()),
+
+			wf:state (notes, Notes),
+
+			% render page
+
+			#template { file = "./templates/page.html" }
+
 		end.
+
+title () ->
+
+	Workspace =
+		wf:state (workspace),
+
+	[ Workspace #workspace.name, " - Notes workspace" ].
+
+layout () ->
+
+	[	#h1 { text = "Workspace" },
+
+		layout_add_quick_note (),
+
+		#panel {
+			id = quick_notes,
+			body = layout_view_quick_notes () }
+	].
 
 layout_add_quick_note () ->
 

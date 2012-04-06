@@ -42,19 +42,31 @@ def driver
 
 	unless $the_driver
 
-		$the_driver = Selenium::WebDriver.for :firefox
+		driver_type = (ENV["DRIVER_TYPE"] || "chrome").to_sym
 
-		#$the_driver =
-		#	Selenium::WebDriver.for(
-		#		:remote,
-		#		:url => "http://localhost:4444/wd/hub",
-		#		:desired_capabilities =>
-		#			Selenium::WebDriver::Remote::Capabilities.htmlunit(
-		#				:javascript_enabled => true))
+		case driver_type
+
+			when :chrome, :firefox
+				$the_driver = Selenium::WebDriver.for driver_type
+
+			when :html_unit
+				$the_driver =
+					Selenium::WebDriver.for(
+						:remote,
+						:url => "http://localhost:4444/wd/hub",
+						:desired_capabilities =>
+							Selenium::WebDriver::Remote::Capabilities.htmlunit(
+								:javascript_enabled => true))
+
+			else
+				raise "Invalid driver type #{driver_type}"
+
+		end
 
 		at_exit do
 			$the_driver.close
 		end
+
 	end
 	the_driver = $the_driver
 

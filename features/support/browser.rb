@@ -21,7 +21,7 @@ end
 
 def local_url
 	unless simple_url =~ /^#{Regexp.quote $url}(\/.+)$/
-		raise "Not a local url"
+		raise "Not a local url: #{simple_url}"
 	end
 	return $1
 end

@@ -18,74 +18,39 @@
 
 -include ("data.hrl").
 
+-define (TARGET,
+	notes_data_workspace_server).
+
+-define (CALL (Message),
+	notes_server:call (
+		?TARGET,
+		WorkspaceId,
+		Message)).
+
 % public api - general
 
 create (WorkspaceId, UserId, Name) ->
-
-	gen_server:call (
-		get_pid (WorkspaceId),
-		{ create, UserId, Name }).
+	?CALL ({ create, UserId, Name }).
 
 get_workspace (WorkspaceId, UserId) ->
-
-	gen_server:call (
-		get_pid (WorkspaceId),
-		{ get_workspace, UserId }).
+	?CALL ({ get_workspace, UserId }).
 
 stop (WorkspaceId) ->
-
-	gen_server:call (
-		get_pid (WorkspaceId),
-		stop).
+	?CALL (stop).
 
 % public api - notes
 
 add_note (WorkspaceId, UserId, Text) ->
-
-	gen_server:call (
-		get_pid (WorkspaceId),
-		{ add_note, UserId, Text }).
+	?CALL ({ add_note, UserId, Text }).
 
 delete_note (WorkspaceId, UserId, NoteId) ->
-
-	gen_server:call (
-		get_pid (WorkspaceId),
-		{ delete_note, UserId, NoteId }).
+	?CALL ({ delete_note, UserId, NoteId }).
 
 get_note (WorkspaceId, UserId, NoteId) ->
-
-	gen_server:call (
-		get_pid (WorkspaceId),
-		{ get_note, UserId, NoteId }).
+	?CALL ({ get_note, UserId, NoteId }).
 
 get_notes (WorkspaceId, UserId) ->
-
-	gen_server:call (
-		get_pid (WorkspaceId),
-		{ get_notes, UserId }).
+	?CALL ({ get_notes, UserId }).
 
 set_note (WorkspaceId, UserId, NoteId, Text) ->
-
-	gen_server:call (
-		get_pid (WorkspaceId),
-		{ set_note, UserId, NoteId, Text }).
-
-% internal api
-
-get_pid (WorkspaceId) ->
-
-	Name = { workspace, WorkspaceId },
-
-	case gen_server:start_link (
-			{ global, Name },
-			notes_data_workspace_server,
-			[ WorkspaceId ],
-			[]) of
-
-		{ error, { already_started, Pid }} ->
-			Pid;
-
-		{ ok, Pid } ->
-			Pid
-
-	end.
+	?CALL ({ set_note, UserId, NoteId, Text }).

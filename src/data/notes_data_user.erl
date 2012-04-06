@@ -10,42 +10,25 @@
 
 -include ("data.hrl").
 
+-define (TARGET,
+	notes_data_user_server).
+
+-define (CALL (Message),
+	notes_server:call (
+		?TARGET,
+		UserId,
+		Message)).
+
 % public api
 
 get_workspaces (UserId) ->
 
-	gen_server:call (
-		get_pid (UserId),
-		get_workspaces).
+	?CALL (get_workspaces).
 
 create_workspace (UserId, Name) ->
 
-	gen_server:call (
-		get_pid (UserId),
-		{ create_workspace, Name }).
+	?CALL ({ create_workspace, Name }).
 
 stop (UserId) ->
 
-	gen_server:call (
-		get_pid (UserId),
-		stop).
-
-% internal api
-
-get_pid (UserId) ->
-
-	Name = { user, UserId },
-
-	case gen_server:start_link (
-			{ global, Name },
-			notes_data_user_server,
-			[ UserId ],
-			[]) of
-
-		{ error, { already_started, Pid }} ->
-			Pid;
-
-		{ ok, Pid } ->
-			Pid
-
-	end.
+	?CALL (stop).

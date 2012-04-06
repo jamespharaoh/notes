@@ -3,6 +3,7 @@
 /.deps-flag
 /.eunit
 /bundle
+/chromedriver.log
 /data
 /deps
 /ebin

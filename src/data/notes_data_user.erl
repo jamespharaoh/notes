@@ -1,4 +1,4 @@
--module (user_data).
+-module (notes_data_user).
 
 -export ([
 
@@ -38,7 +38,7 @@ get_pid (UserId) ->
 
 	case gen_server:start_link (
 			{ global, Name },
-			user_server,
+			notes_data_user_server,
 			[ UserId ],
 			[]) of
 

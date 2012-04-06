@@ -20,7 +20,7 @@ def simple_url
 end
 
 def local_url
-	unless simple_url =~ /^#{Regexp.quote $url}(\/.+)$/
+	unless simple_url =~ /^#{Regexp.quote $url}(\/.*)$/
 		raise "Not a local url: #{simple_url}"
 	end
 	return $1
@@ -95,7 +95,7 @@ def find_element name
 
 	# raise an error
 
-	raise "Can't find element: #{name}"
+	return nil
 end
 
 def find_link title
@@ -119,7 +119,7 @@ Given /^#{I_HAVE}opened #{ANY_RE}$/ do |page|
 end
 
 Given /^#{I_HAVE}located the #{STRING_RE}/ do |name|
-	@element = find_element name
+	@element = wait_for { find_element name }
 end
 
 Given /^#{I_HAVE}logged in$/ do
@@ -136,10 +136,12 @@ When /^#{I}create a workspace named #{STRING_RE}$/ do |name|
 	step "open the home page"
 	step "enter \"#{name}\" in \"workspace name\""
 	step "click the \"create workspace button\""
+	wait_for { local_url =~ /^ \/workspace\/ [a-z]{16} $/x }
 end
 
 When /^#{I}open the page at #{STRING_RE}/ do |path|
 	driver.get "#{$url}#{path}"
+	wait_for_local_url path
 end
 
 When /^#{I}open the home page$/ do
@@ -157,17 +159,17 @@ When /^#{I}open a workspace$/ do
 	step "create a workspace named \"Test workspace \""
 end
 
-Given /^#{I}locate the #{STRING_RE}/ do |name|
-	@element = find_element name
+When /^#{I}locate the #{STRING_RE}/ do |name|
+	@element = wait_for { find_element name }
 end
 
 When /^#{I}click the #{STRING_RE}$/ do |name|
-	button = find_element name
+	button = wait_for { find_element name }
 	button.click
 end
 
 When /^#{I}enter #{STRING_RE} in #{STRING_RE}$/ do |value, name|
-	field = find_element name
+	field = wait_for { find_element name }
 	field.send_keys [ :control, "a" ]
 	field.send_keys value
 end
@@ -179,6 +181,40 @@ When /^#{I}fill in the following fields:$/ do |table|
 		field = find_element name
 		field.send_keys [ :control, "a" ]
 		field.send_keys value
+	end
+end
+
+DEFAULT_TIMEOUT = 1
+DEFAULT_INTERVAL = 0.5
+
+def wait_for_simple_url url_match, timeout = 1, interval = 0.5
+	wait_for(timeout, interval) { url_match === simple_url }
+end
+
+def wait_for_local_url url_match, timeout = 1, interval = 0.5
+	wait_for(timeout, interval) { url_match === local_url }
+end
+
+def wait_for timeout = 1, interval = 0.1
+
+	timeout_at = Time.now.to_f + timeout
+
+	while true
+
+		# check for success
+
+		ret = yield
+		return ret if ret
+
+		# check for timeout
+
+		if timeout_at < Time.now.to_f
+			raise "Timed out"
+		end
+
+		# sleep
+
+		sleep interval
 	end
 end
 
@@ -197,6 +233,8 @@ When /^#{I}log in via openid$/ do
 
 	# first simpleid page
 
+	wait_for { simple_url == "http://localhost/~james/simpleid/www/index.php" }
+
 	field = driver.find_element :id, "edit-name"
 	field.send_keys [ :control, "a" ]
 	field.send_keys "test"
@@ -210,20 +248,22 @@ When /^#{I}log in via openid$/ do
 
 	# second simpleid page
 
+	wait_for { simple_url == "http://localhost/~james/simpleid/www/index.php" }
+
 	field = driver.find_element :id, "edit-submit"
 	field.click
 
 end
 
 When /^#{I}log out$/ do
-	button = find_element "logout_button"
+	button = wait_for { find_element "logout_button" }
 	button.click
 end
 
 # then
 
 Then /^the #{STRING_RE} should be displayed$/ do |name|
-	@element = find_element name
+	@element = wait_for { find_element name }
 end
 
 Then /^#{I}should see a link titled #{STRING_RE}$/ do |title|
@@ -245,16 +285,15 @@ Then /^it should have the following fields:$/ do |table|
 end
 
 Then /^the location should be #{STRING_RE}$/ do |url|
-	url = "#{$url}#{url}" if url[0] == "/"
-	simple_url.should eq url
+	wait_for_local_url url
 end
 
 Then /^#{I}should be logged in$/ do
-	find_element "logged_in"
+	wait_for { find_element "logged_in" }
 end
 
 Then /^#{I}should not be logged in$/ do
-	find_element "not_logged_in"
+	wait_for { find_element "not_logged_in" }
 end
 
 Then /^#{I}should be on the home page$/ do
@@ -262,6 +301,7 @@ Then /^#{I}should be on the home page$/ do
 end
 
 Then /^#{I}should be on the workspace page for #{STRING_RE}$/ do |workspace_name|
-	local_url.should match(/^ \/ workspace \/ ([a-z]{16}) $/x)
+	#local_url.should match(/^ \/ workspace \/ ([a-z]{16}) $/x)
+	wait_for_local_url /^ \/ workspace \/ ([a-z]{16}) $/x
 	driver.title.should eq("#{workspace_name} - Notes workspace")
 end

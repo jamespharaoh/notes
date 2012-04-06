@@ -1,4 +1,4 @@
--module (workspace).
+-module (notes_path_workspace).
 
 -include_lib ("nitrogen_core/include/wf.hrl").
 
@@ -19,7 +19,7 @@ main () ->
 			% load workspace
 
 			{ ok, Workspace } =
-				workspace_data:get_workspace (
+				notes_data_workspace:get_workspace (
 					workspace_id (),
 					wf:user ()),
 
@@ -28,7 +28,7 @@ main () ->
 			% load notes
 
 			{ ok, Notes } =
-				workspace_data:get_notes (
+				notes_data_workspace:get_notes (
 					workspace_id (),
 					wf:user ()),
 
@@ -76,7 +76,7 @@ layout_add_quick_note () ->
 
 layout_view_quick_notes () ->
 
-	case workspace_data:get_notes (
+	case notes_data_workspace:get_notes (
 			workspace_id (),
 			wf:user ()) of
 
@@ -153,7 +153,7 @@ event (add_quick_ok) ->
 	Text =
 		wf:q (add_quick_text),
 
-	workspace_data:add_note (
+	notes_data_workspace:add_note (
 		workspace_id (),
 		wf:user (),
 		Text),
@@ -165,7 +165,7 @@ event (add_quick_ok) ->
 event ({ start_edit, PanelId, NoteId }) ->
 
 	{ ok, Note } =
-		workspace_data:get_note (
+		notes_data_workspace:get_note (
 			workspace_id (),
 			wf:user (),
 			NoteId),
@@ -179,7 +179,7 @@ event ({ start_edit, PanelId, NoteId }) ->
 event ({ delete, NoteId, PanelId }) ->
 
 	{ ok, _Note } =
-		workspace_data:delete_note (
+		notes_data_workspace:delete_note (
 			workspace_id (),
 			wf:user (),
 			NoteId),
@@ -191,7 +191,7 @@ event ({ edit_quick_ok, NoteId, PanelId, TextId }) ->
 	Text = wf:q (TextId),
 
 	{ ok, Note } =
-		workspace_data:set_note (
+		notes_data_workspace:set_note (
 			workspace_id (),
 			wf:user (),
 			NoteId,

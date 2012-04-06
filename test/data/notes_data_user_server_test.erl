@@ -1,4 +1,4 @@
--module (user_server_test).
+-module (notes_data_user_server_test).
 
 -include_lib ("eunit/include/eunit.hrl").
 
@@ -8,14 +8,17 @@
 
 -define (EXPECT,
 	Em = em:new (),
-	em:nothing (Em, data),
-	em:nothing (Em, random)).
+	em:nothing (Em, notes_random),
+	em:nothing (Em, notes_store)).
 
 -define (REPLAY,
 	em:replay (Em)).
 
 -define (VERIFY,
 	em:verify (Em)).
+
+-define (TARGET,
+	notes_data_user_server).
 
 % match functions
 
@@ -49,11 +52,11 @@ init_test () ->
 
 	?EXPECT,
 
-		em:strict (Em, data, read,
+		em:strict (Em, notes_store, read,
 
 			[ match_str ([
 				"users/",
-				misc:sha1 ("user_0"),
+				notes_misc:sha1 ("user_0"),
 				"/workspaces" ]) ],
 
 			{ return,
@@ -65,7 +68,7 @@ init_test () ->
 
 			{ ok, state_fixture () },
 
-			user_server:init (
+			?TARGET:init (
 				[ "user_0" ])),
 
 	?VERIFY.
@@ -84,7 +87,7 @@ handle_call_stop_test () ->
 
 			{ stop, normal, ok, State },
 
-			user_server:handle_call (
+			?TARGET:handle_call (
 				stop,
 				from,
 				State)),
@@ -103,7 +106,7 @@ handle_call_get_workspaces_test () ->
 				{ ok, workspaces_fixture () },
 				state_fixture () },
 
-			user_server:handle_call (
+			?TARGET:handle_call (
 				get_workspaces,
 				from,
 				state_fixture ())),
@@ -129,14 +132,14 @@ handle_call_create_workspace_test () ->
 
 	?EXPECT,
 
-		em:strict (Em, random, random_id, [ ],
+		em:strict (Em, notes_random, random_id, [ ],
 			{ return, "workspace_z" }),
 
-		em:strict (Em, data, write,
+		em:strict (Em, notes_store, write,
 
 			[	match_str ([
 					"users/",
-					misc:sha1 ("user_0"),
+					notes_misc:sha1 ("user_0"),
 					"/workspaces" ]),
 				NewWorkspaces ],
 
@@ -150,7 +153,7 @@ handle_call_create_workspace_test () ->
 				{ ok, NewWorkspace },
 				NewState },
 
-			user_server:handle_call (
+			?TARGET:handle_call (
 				{ create_workspace, "Workspace zed" },
 				from,
 				State)),
@@ -173,7 +176,7 @@ handle_call_test () ->
 				{ unknown_call, Message },
 				State },
 
-			user_server:handle_call (
+			?TARGET:handle_call (
 				Message,
 				from,
 				State)),
@@ -196,7 +199,7 @@ handle_cast_test () ->
 				{ unknown_cast, Message },
 				State },
 
-			user_server:handle_cast (
+			?TARGET:handle_cast (
 				Message,
 				State)),
 
@@ -218,7 +221,7 @@ handle_info_test () ->
 				{ unknown_info, Message },
 				State },
 
-			user_server:handle_info (
+			?TARGET:handle_info (
 				Message,
 				State)),
 
@@ -238,7 +241,7 @@ terminate_test () ->
 
 			ok,
 
-			user_server:terminate (
+			?TARGET:terminate (
 				Reason,
 				State)),
 
@@ -260,7 +263,7 @@ code_change_test () ->
 
 			{ ok, State },
 
-			user_server:code_change (
+			?TARGET:code_change (
 				OldVersion,
 				State,
 				Extra)),

@@ -1,4 +1,4 @@
--module (workspace_server_test).
+-module (notes_data_workspace_server_test).
 
 -include_lib ("eunit/include/eunit.hrl").
 
@@ -8,14 +8,17 @@
 
 -define (EXPECT,
 	Em = em:new (),
-	em:nothing (Em, data),
-	em:nothing (Em, random)).
+	em:nothing (Em, notes_random),
+	em:nothing (Em, notes_store)).
 
 -define (REPLAY,
 	em:replay (Em)).
 
 -define (VERIFY,
 	em:verify (Em)).
+
+-define (TARGET,
+	notes_data_workspace_server).
 
 % match functions
 
@@ -77,15 +80,15 @@ init_test () ->
 
 	?EXPECT,
 
-		em:strict (Em, data, read,
+		em:strict (Em, notes_store, read,
 			[ match_str ("workspaces/workspace_0/workspace") ],
 			{ return, { ok, [ workspace_fixture () ] } }),
 
-		em:strict (Em, data, read,
+		em:strict (Em, notes_store, read,
 			[ match_str ("workspaces/workspace_0/notes") ],
 			{ return, { ok, notes_fixture () } }),
 
-		em:strict (Em, data, read,
+		em:strict (Em, notes_store, read,
 			[ match_str ("workspaces/workspace_0/perms") ],
 			{ return, { ok, perms_fixture () } }),
 
@@ -95,7 +98,7 @@ init_test () ->
 
 			{ ok, state_fixture () },
 
-			workspace_server:init (
+			?TARGET:init (
 				[ workspace_id () ])),
 
 	?VERIFY.
@@ -111,15 +114,15 @@ init_new_test () ->
 
 	?EXPECT,
 
-		em:strict (Em, data, read,
+		em:strict (Em, notes_store, read,
 			[ match_str ("workspaces/workspace_0/workspace") ],
 			{ return, { ok, [ ] } }),
 
-		em:strict (Em, data, read,
+		em:strict (Em, notes_store, read,
 			[ match_str ("workspaces/workspace_0/notes") ],
 			{ return, { ok, [ ] } }),
 
-		em:strict (Em, data, read,
+		em:strict (Em, notes_store, read,
 			[ match_str ("workspaces/workspace_0/perms") ],
 			{ return, { ok, [ ] } }),
 
@@ -129,7 +132,7 @@ init_new_test () ->
 
 			{ ok, NewState },
 
-			workspace_server:init (
+			?TARGET:init (
 				[ workspace_id () ])),
 
 	?VERIFY.
@@ -148,7 +151,7 @@ handle_call_stop_test () ->
 
 			{ stop, normal, ok, State },
 
-			workspace_server:handle_call (
+			?TARGET:handle_call (
 				stop,
 				from,
 				State)),
@@ -180,12 +183,12 @@ handle_call_create_success_test () ->
 
 	?EXPECT,
 
-		em:strict (Em, data, write,
+		em:strict (Em, notes_store, write,
 			[	match_str ("workspaces/workspace_0/workspace"),
 				[ NewWorkspace ] ],
 			{ return, ok }),
 
-		em:strict (Em, data, write,
+		em:strict (Em, notes_store, write,
 			[	match_str ("workspaces/workspace_0/perms"),
 				NewPerms ],
 			{ return, ok }),
@@ -196,7 +199,7 @@ handle_call_create_success_test () ->
 
 			{ reply, ok, AfterState },
 
-			workspace_server:handle_call (
+			?TARGET:handle_call (
 				{ create, "some_user", "Workspace name" },
 				from,
 				BeforeState)),
@@ -215,7 +218,7 @@ handle_call_create_already_exists_test () ->
 
 			{ reply, already_exists, State },
 
-			workspace_server:handle_call (
+			?TARGET:handle_call (
 				{ create, "some_user", "Workspace name" },
 				from,
 				State)),
@@ -236,7 +239,7 @@ handle_call_get_workspace_permission_denied_test () ->
 
 			{ reply, permission_denied, State },
 
-			workspace_server:handle_call (
+			?TARGET:handle_call (
 				{ get_workspace, "none_user" },
 				from,
 				State)),
@@ -257,7 +260,7 @@ handle_call_get_workspace_success_test () ->
 				{ ok, workspace_fixture () },
 				State },
 
-			workspace_server:handle_call (
+			?TARGET:handle_call (
 				{ get_workspace, "read_user" },
 				from,
 				State)),
@@ -278,7 +281,7 @@ handle_call_add_note_permission_denied_test () ->
 
 			{ reply, permission_denied, State },
 
-			workspace_server:handle_call (
+			?TARGET:handle_call (
 				{ add_note, "read_user", "Body" },
 				from,
 				State)),
@@ -303,10 +306,10 @@ handle_call_add_note_success_test () ->
 
 	?EXPECT,
 
-		em:strict (Em, random, random_id, [ ],
+		em:strict (Em, notes_random, random_id, [ ],
 			{ return, "note_id" }),
 
-		em:strict (Em, data, write,
+		em:strict (Em, notes_store, write,
 			[	match_str ("workspaces/workspace_0/notes"),
 				NewNotes ],
 			{ return, ok }),
@@ -317,7 +320,7 @@ handle_call_add_note_success_test () ->
 
 			{ reply, { ok, Note }, AfterState },
 
-			workspace_server:handle_call (
+			?TARGET:handle_call (
 				{ add_note, "write_user", "Blah" },
 				from,
 				BeforeState)),
@@ -336,7 +339,7 @@ handle_call_get_notes_permission_denied_test () ->
 
 			{ reply, permission_denied, State },
 
-			workspace_server:handle_call (
+			?TARGET:handle_call (
 				{ get_notes, "none_user" },
 				from,
 				State)),
@@ -356,7 +359,7 @@ handle_call_get_notes_success_test () ->
 
 			{ reply, { ok, Notes }, State },
 
-			workspace_server:handle_call (
+			?TARGET:handle_call (
 				{ get_notes, "read_user" },
 				from,
 				State)),
@@ -375,7 +378,7 @@ handle_call_get_note_permission_denied_test () ->
 
 			{ reply, permission_denied, State },
 
-			workspace_server:handle_call (
+			?TARGET:handle_call (
 				{ get_note, "none_user", "note_0" },
 				from,
 				State)),
@@ -394,7 +397,7 @@ handle_call_get_note_permission_not_found_test () ->
 
 			{ reply, not_found, State },
 
-			workspace_server:handle_call (
+			?TARGET:handle_call (
 				{ get_note, "read_user", "note_x" },
 				from,
 				State)),
@@ -414,7 +417,7 @@ handle_call_get_note_success_test () ->
 
 		{ reply, { ok, Note }, State },
 
-		workspace_server:handle_call (
+		?TARGET:handle_call (
 			{ get_note, "read_user", "note_0" },
 			from,
 			State)),
@@ -433,7 +436,7 @@ handle_call_set_note_permission_denied_test () ->
 
 			{ reply, permission_denied, State },
 
-			workspace_server:handle_call (
+			?TARGET:handle_call (
 				{ set_note, "read_user", "note_0", "New text" },
 				from,
 				State)),
@@ -452,7 +455,7 @@ handle_call_set_note_not_found_test () ->
 
 			{ reply, not_found, State },
 
-			workspace_server:handle_call (
+			?TARGET:handle_call (
 				{ set_note, "write_user", "note_x", "New text" },
 				from,
 				State)),
@@ -477,7 +480,7 @@ handle_call_set_note_ok_test () ->
 
 	?EXPECT,
 
-		em:strict (Em, data, write,
+		em:strict (Em, notes_store, write,
 			[	match_str ("workspaces/workspace_0/notes"),
 				NewNotes ],
 			{ return, ok }),
@@ -488,7 +491,7 @@ handle_call_set_note_ok_test () ->
 
 			{ reply, { ok, NewNote }, NewState },
 
-			workspace_server:handle_call (
+			?TARGET:handle_call (
 				{ set_note, "write_user", "note_0", "New text" },
 				from,
 				State)),
@@ -507,7 +510,7 @@ handle_call_delete_note_permission_denied_test () ->
 
 			{ reply, permission_denied, State },
 
-			workspace_server:handle_call (
+			?TARGET:handle_call (
 				{ delete_note, "read_user", "note_0" },
 				from,
 				State)),
@@ -526,7 +529,7 @@ handle_call_delete_note_not_found_test () ->
 
 			{ reply, not_found, State },
 
-			workspace_server:handle_call (
+			?TARGET:handle_call (
 				{ delete_note, "write_user", "note_x" },
 				from,
 				State)),
@@ -547,7 +550,7 @@ handle_call_delete_note_ok_test () ->
 
 	?EXPECT,
 
-		em:strict (Em, data, write,
+		em:strict (Em, notes_store, write,
 			[	match_str ("workspaces/workspace_0/notes"),
 				NewNotes ],
 			{ return, ok }),
@@ -558,7 +561,7 @@ handle_call_delete_note_ok_test () ->
 
 			{ reply, { ok, Note }, NewState },
 
-			workspace_server:handle_call (
+			?TARGET:handle_call (
 				{ delete_note, "write_user", "note_0" },
 				from,
 				State)),
@@ -579,7 +582,7 @@ handle_call_test () ->
 
 			{ stop, { unknown_call, Message }, State },
 
-			workspace_server:handle_call (
+			?TARGET:handle_call (
 				Message,
 				from,
 				State)),
@@ -600,7 +603,7 @@ handle_cast_test () ->
 
 			{ stop, { unknown_cast, Message }, State },
 
-			workspace_server:handle_cast (
+			?TARGET:handle_cast (
 				Message,
 				State)),
 
@@ -620,7 +623,7 @@ handle_info_test () ->
 
 			{ stop, { unknown_info, Message }, State },
 
-			workspace_server:handle_info (
+			?TARGET:handle_info (
 				Message,
 				State)),
 
@@ -640,7 +643,7 @@ terminate_test () ->
 
 			ok,
 
-			workspace_server:terminate (
+			?TARGET:terminate (
 				Reason,
 				State)),
 
@@ -662,7 +665,7 @@ code_change_test () ->
 
 			{ ok, State },
 
-			workspace_server:code_change (
+			?TARGET:code_change (
 				OldVersion,
 				State,
 				Extra)),

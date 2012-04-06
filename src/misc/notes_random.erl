@@ -1,4 +1,4 @@
--module (random).
+-module (notes_random).
 
 -export ([
 	random_id/0 ]).

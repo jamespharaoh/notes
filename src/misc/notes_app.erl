@@ -7,7 +7,7 @@
 	stop/1 ]).
 
 start (_StartType, _StartArgs) ->
-    notes_sup:start_link ().
+    notes_supervisor:start_link ().
 
 stop (_State) ->
     ok.

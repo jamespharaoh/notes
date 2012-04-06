@@ -42,7 +42,7 @@ cleaner: clean
 
 tests: eunit cucumber
 
-eunit:
+eunit: compile
 	./rebar eunit skip_deps=true
 
 cucumber: .bundle-flag

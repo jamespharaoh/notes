@@ -1,4 +1,4 @@
--module (workspace_data).
+-module (notes_data_workspace).
 
 -export ([
 
@@ -78,7 +78,7 @@ get_pid (WorkspaceId) ->
 
 	case gen_server:start_link (
 			{ global, Name },
-			workspace_server,
+			notes_data_workspace_server,
 			[ WorkspaceId ],
 			[]) of
 

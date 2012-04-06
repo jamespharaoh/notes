@@ -1,4 +1,4 @@
--module (misc).
+-module (notes_misc).
 
 -export ([
 	sha1/1 ]).

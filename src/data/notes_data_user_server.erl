@@ -1,4 +1,4 @@
--module (user_server).
+-module (notes_data_user_server).
 
 -behaviour (gen_server).
 
@@ -43,7 +43,7 @@ handle_call ({ create_workspace, Name }, _From, State0) ->
 
 	% create workspace
 
-	WorkspaceId = random:random_id (),
+	WorkspaceId = notes_random:random_id (),
 
 	Workspace = #user_workspace {
 		workspace_id = WorkspaceId,
@@ -91,15 +91,15 @@ code_change (_OldVersion, State, _Extra) ->
 
 read (State, Name) ->
 
-	data:read (full_name (State, Name)).
+	notes_store:read (full_name (State, Name)).
 
 write (State, Name, Value) ->
 
-	data:write (full_name (State, Name), Value).
+	notes_store:write (full_name (State, Name), Value).
 
 full_name (State, Name) ->
 
 	[	"users/",
-		misc:sha1 (State #user_state.user_id),
+		notes_misc:sha1 (State #user_state.user_id),
 		"/",
 		Name ].

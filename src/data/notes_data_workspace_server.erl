@@ -1,4 +1,4 @@
--module (workspace_server).
+-module (notes_data_workspace_server).
 
 -behaviour (gen_server).
 
@@ -141,7 +141,7 @@ handle_call ({ add_note, UserId, Text }, _From, State0) ->
 			% add note
 
 			Note = #workspace_note {
-				note_id = random:random_id (),
+				note_id = notes_random:random_id (),
 				text = Text },
 
 			Notes = [ Note | State0#workspace_state.notes ],
@@ -358,11 +358,11 @@ code_change (_OldVersion, State, _Extra) ->
 
 read (State, Name) ->
 
-	data:read (full_name (State, Name)).
+	notes_store:read (full_name (State, Name)).
 
 write (State, Name, Value) ->
 
-	data:write (full_name (State, Name), Value).
+	notes_store:write (full_name (State, Name), Value).
 
 full_name (State, Name) ->
 

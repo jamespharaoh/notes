@@ -1,4 +1,4 @@
--module (notes_sup).
+-module (notes_supervisor).
 
 -behaviour (supervisor).
 
@@ -53,6 +53,11 @@ init ([]) ->
 	ok = application:start (openid),
 	ok = application:start (public_key),
 	ok = application:start (ssl),
+
+	% start nitrogen
+
+	ok = application:start (sasl),
+	ok = application:start (nitrogen_core),
 
 	% and return
 

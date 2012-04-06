@@ -1,4 +1,4 @@
--module (index).
+-module (notes_path_index).
 
 -include_lib ("nitrogen_core/include/wf.hrl").
 
@@ -7,6 +7,8 @@
 -compile (export_all).
 
 main () ->
+
+io:format ("LOGGED IN: ~s~n", [ wf:user () ]),
 
 	case wf:q ("openid.ns") of
 
@@ -58,7 +60,7 @@ session_id () ->
 
 		undefined ->
 
-			SessionId = random:random_id (),
+			SessionId = notes_random:random_id (),
 
 			wf:session (session_id, SessionId),
 
@@ -109,7 +111,7 @@ layout_authenticated () ->
 	FormId = wf:temp_id (),
 
 	{ ok, Workspaces } =
-		user_data:get_workspaces (wf:user ()),
+		notes_data_user:get_workspaces (wf:user ()),
 
 	[	#h1 { text = "Notes - Main menu" },
 
@@ -169,12 +171,12 @@ event ({ create_workspace, FormId }) ->
 		wf:q (FormId ++ ".workspace_name"),
 
 	{ ok, Workspace } =
-		user_data:create_workspace (
+		notes_data_user:create_workspace (
 			wf:user (),
 			WorkspaceName),
 
 	ok =
-		workspace_data:create (
+		notes_data_workspace:create (
 			Workspace#user_workspace.workspace_id,
 			wf:user (),
 			WorkspaceName),

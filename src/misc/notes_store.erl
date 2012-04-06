@@ -1,4 +1,4 @@
--module (data).
+-module (notes_store).
 
 -export ([
 	read/1,

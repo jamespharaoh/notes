@@ -1,4 +1,4 @@
--module (test_reset).
+-module (notes_path_test_reset).
 
 -include_lib ("kernel/include/file.hrl").
 -include_lib ("nitrogen_core/include/wf.hrl").
@@ -12,11 +12,11 @@ main () ->
 	StopFunc = fun
 
 		({ user, UserId }, Count) ->
-			user_data:stop (UserId),
+			notes_data_user:stop (UserId),
 			Count + 1;
 
 		({ workspace, WorkspaceId }, Count) ->
-			workspace_data:stop (WorkspaceId),
+			notes_data_workspace:stop (WorkspaceId),
 			Count + 1;
 
 		(_, Count) ->

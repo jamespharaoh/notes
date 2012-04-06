@@ -26,6 +26,15 @@ init ([ WorkspaceId ]) ->
 	State0 = #workspace_state {
 		workspace_id = WorkspaceId },
 
+	{ ok, Workspaces } =
+		read (State0, "workspace"),
+
+	Workspace =
+		case Workspaces of
+			[] -> undefined;
+			[ Something ] -> Something
+			end,
+
 	{ ok, Notes } =
 		read (State0, "notes"),
 
@@ -33,41 +42,51 @@ init ([ WorkspaceId ]) ->
 		read (State0, "perms"),
 
 	State1 = State0#workspace_state {
+		workspace = Workspace,
 		notes = Notes,
 		perms = Perms },
 
 	{ ok, State1 }.
 
-handle_call ({ set_owner, UserId }, _From, State0) ->
+handle_call ({ create, UserId, Name }, _From, State0) ->
 
-	% check for existing perms
+	% check for existing workspace
 
-	case State0#workspace_state.perms of
+	case State0 #workspace_state.workspace of
 
-		[] ->
+		undefined ->
 
-			% set new perms
+			% create workspace
+
+			Workspace = #workspace {
+				workspace_id = State0 #workspace_state.workspace_id,
+				name = Name },
+
+			% create permissions
 
 			Perms = [
 				#workspace_perm {
 					user_id = UserId,
 					roles = [ owner ] }],
 
-			% save perms
+			% save changed stuff
+
+			write (State0, "workspace", [ Workspace ]),
 
 			write (State0, "perms", Perms),
 
 			% return
 
 			State1 =
-				State0#workspace_state {
+				State0 #workspace_state {
+					workspace = Workspace,
 					perms = Perms },
 
 			Ret = ok,
 
 			{ reply, Ret, State1 };
 
-		[ _ | _ ] ->
+		_ ->
 
 			Ret = already_exists,
 

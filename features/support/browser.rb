@@ -143,6 +143,8 @@ end
 
 When /^#{I}log in via openid$/ do
 
+	# begin login on our site
+
 	step "open the home page"
 	step "locate the \"login form\""
 	step "fill in the following fields:",
@@ -152,25 +154,21 @@ When /^#{I}log in via openid$/ do
 		])
 	step "click the \"ok button\""
 
-	# first page
+	# first simpleid page
 
-	# enter username
 	field = driver.find_element :id, "edit-name"
 	field.send_keys [ :control, "a" ]
 	field.send_keys "test"
 
-	# enter password
 	field = driver.find_element :id, "edit-pass"
 	field.send_keys [ :control, "a" ]
 	field.send_keys "test"
 
-	# click ok
 	field = driver.find_element :id, "edit-submit"
 	field.click
 
-	# second page
+	# second simpleid page
 
-	# click ok
 	field = driver.find_element :id, "edit-submit"
 	field.click
 
@@ -216,5 +214,5 @@ end
 
 Then /^I should be on the workspace page for #{STRING_RE}$/ do |workspace_name|
 	local_url.should match(/^ \/ workspace \/ ([a-z]{16}) $/x)
-	# TODO check name!
+	driver.title.should eq("#{workspace_name} - Notes workspace")
 end

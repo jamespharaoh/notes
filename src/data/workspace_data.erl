@@ -4,7 +4,7 @@
 
 	% public api
 
-	set_owner/2,
+	create/3,
 
 	add_note/3,
 	delete_note/3,
@@ -18,10 +18,10 @@
 
 % public api - general
 
-set_owner (WorkspaceId, UserId) ->
+create (WorkspaceId, UserId, Name) ->
 
 	gen_server:call (get_pid (WorkspaceId),
-		{ set_owner, UserId }).
+		{ create, UserId, Name }).
 
 % public api - notes
 

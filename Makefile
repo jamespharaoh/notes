@@ -46,7 +46,10 @@ eunit:
 	./rebar eunit skip_deps=true
 
 cucumber: .bundle-flag
-	bundle exec cucumber
+	bundle exec cucumber --tags ~@wip
+
+cucumber-wip: .bundle-flag
+	bundle exec cucumber --tags @wip
 
 # rebar
 

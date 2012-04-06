@@ -30,10 +30,19 @@ match_str (String) ->
 workspace_id () ->
 	"workspace_0".
 
+workspace_name () ->
+	"Workspace 0".
+
+workspace_fixture () ->
+	#workspace {
+		workspace_id = workspace_id (),
+		name = workspace_name () }.
+
 state_fixture () ->
 
 	#workspace_state {
 		workspace_id = workspace_id (),
+		workspace = workspace_fixture (),
 		notes = notes_fixture (),
 		perms = perms_fixture () }.
 
@@ -69,6 +78,10 @@ init_test () ->
 	?EXPECT,
 
 		em:strict (Em, data, read,
+			[ match_str ("workspaces/workspace_0/workspace") ],
+			{ return, { ok, [ workspace_fixture () ] } }),
+
+		em:strict (Em, data, read,
 			[ match_str ("workspaces/workspace_0/notes") ],
 			{ return, { ok, notes_fixture () } }),
 
@@ -87,11 +100,50 @@ init_test () ->
 
 	?VERIFY.
 
-handle_call_set_owner_success_test () ->
+init_new_test () ->
+
+	NewState =
+		#workspace_state {
+			workspace_id = "workspace_0",
+			workspace = undefined,
+			perms = [],
+			notes = [] },
+
+	?EXPECT,
+
+		em:strict (Em, data, read,
+			[ match_str ("workspaces/workspace_0/workspace") ],
+			{ return, { ok, [ ] } }),
+
+		em:strict (Em, data, read,
+			[ match_str ("workspaces/workspace_0/notes") ],
+			{ return, { ok, [ ] } }),
+
+		em:strict (Em, data, read,
+			[ match_str ("workspaces/workspace_0/perms") ],
+			{ return, { ok, [ ] } }),
+
+	?REPLAY,
+
+		?assertEqual (
+
+			{ ok, NewState },
+
+			workspace_server:init (
+				[ workspace_id () ])),
+
+	?VERIFY.
+
+handle_call_create_success_test () ->
 
 	BeforeState =
 		#workspace_state {
 			workspace_id = "workspace_0" },
+
+	NewWorkspace =
+		#workspace {
+			workspace_id = "workspace_0",
+			name = "Workspace name" },
 
 	NewPerms = [
 		#workspace_perm {
@@ -100,9 +152,15 @@ handle_call_set_owner_success_test () ->
 
 	AfterState =
 		BeforeState#workspace_state {
+			workspace = NewWorkspace,
 			perms = NewPerms },
 
 	?EXPECT,
+
+		em:strict (Em, data, write,
+			[	match_str ("workspaces/workspace_0/workspace"),
+				[ NewWorkspace ] ],
+			{ return, ok }),
 
 		em:strict (Em, data, write,
 			[	match_str ("workspaces/workspace_0/perms"),
@@ -116,13 +174,13 @@ handle_call_set_owner_success_test () ->
 			{ reply, ok, AfterState },
 
 			workspace_server:handle_call (
-				{ set_owner, "some_user" },
+				{ create, "some_user", "Workspace name" },
 				from,
 				BeforeState)),
 
 	?VERIFY.
 
-handle_call_set_owner_already_exists_test () ->
+handle_call_create_already_exists_test () ->
 
 	State = state_fixture (),
 
@@ -135,7 +193,7 @@ handle_call_set_owner_already_exists_test () ->
 			{ reply, already_exists, State },
 
 			workspace_server:handle_call (
-				{ set_owner, some_user },
+				{ create, "some_user", "Workspace name" },
 				from,
 				State)),
 

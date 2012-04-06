@@ -1,6 +1,6 @@
 -record (workspace, {
 	workspace_id,
-	owner }).
+	name }).
 
 -record (workspace_note, {
 	note_id,
@@ -12,6 +12,7 @@
 
 -record (workspace_state, {
 	workspace_id,
+	workspace,
 	perms = [],
 	notes = [] }).
 

@@ -5,7 +5,8 @@
 	% public api
 
 	get_workspaces/1,
-	create_workspace/2 ]).
+	create_workspace/2,
+	stop/1 ]).
 
 -include ("data.hrl").
 
@@ -13,13 +14,21 @@
 
 get_workspaces (UserId) ->
 
-	gen_server:call (get_pid (UserId),
+	gen_server:call (
+		get_pid (UserId),
 		get_workspaces).
 
 create_workspace (UserId, Name) ->
 
-	gen_server:call (get_pid (UserId),
+	gen_server:call (
+		get_pid (UserId),
 		{ create_workspace, Name }).
+
+stop (UserId) ->
+
+	gen_server:call (
+		get_pid (UserId),
+		stop).
 
 % internal api
 

@@ -51,6 +51,12 @@ cucumber: .bundle-flag
 cucumber-wip: .bundle-flag
 	bundle exec cucumber --tags @wip
 
+cucumber-dry: .bundle-flag
+	bundle exec cucumber --tags ~@wip --dry-run
+
+cucumber-wip-dry: .bundle-flag
+	bundle exec cucumber --tags @wip --dry-run
+
 # rebar
 
 rebar:

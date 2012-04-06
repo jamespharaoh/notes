@@ -43,7 +43,7 @@ workspace_0_fixture () ->
 		workspace_id = "workspace_0",
 		name = "Workspace zero" }.
 
-% tests
+% init tests
 
 init_test () ->
 
@@ -67,6 +67,27 @@ init_test () ->
 
 			user_server:init (
 				[ "user_0" ])),
+
+	?VERIFY.
+
+% handle_call stop tests
+
+handle_call_stop_test () ->
+
+	State = state_fixture (),
+
+	?EXPECT,
+
+	?REPLAY,
+
+		?assertEqual (
+
+			{ stop, normal, ok, State },
+
+			user_server:handle_call (
+				stop,
+				from,
+				State)),
 
 	?VERIFY.
 

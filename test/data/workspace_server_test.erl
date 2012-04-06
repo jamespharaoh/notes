@@ -134,6 +134,27 @@ init_new_test () ->
 
 	?VERIFY.
 
+% handle_call stop tests
+
+handle_call_stop_test () ->
+
+	State = state_fixture (),
+
+	?EXPECT,
+
+	?REPLAY,
+
+		?assertEqual (
+
+			{ stop, normal, ok, State },
+
+			workspace_server:handle_call (
+				stop,
+				from,
+				State)),
+
+	?VERIFY.
+
 % handle_call create tests
 
 handle_call_create_success_test () ->

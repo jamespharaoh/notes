@@ -48,6 +48,10 @@ init ([ WorkspaceId ]) ->
 
 	{ ok, State1 }.
 
+handle_call (stop, _From, State) ->
+
+	{ stop, normal, ok, State };
+
 handle_call ({ create, UserId, Name }, _From, State0) ->
 
 	% check for existing workspace

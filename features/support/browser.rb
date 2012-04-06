@@ -96,6 +96,20 @@ def find_element name
 	raise "Can't find element: #{name}"
 end
 
+def find_link title
+
+	# search for link with that name
+
+	elements = driver.find_elements :link_text, title
+	raise "Multiple matches for #{title}" if elements.size > 1
+	return elements[0] unless elements.empty?
+
+	# raise an error
+
+	raise "Can't find link: #{title}"
+
+end
+
 # given
 
 Given /^#{I_HAVE}opened the home page$/ do
@@ -108,6 +122,12 @@ end
 
 Given /^#{I_HAVE}logged in$/ do
 	step "log in via openid"
+end
+
+Given /^#{I_HAVE}created a workspace named #{STRING_RE}$/ do |name|
+	step "open the home page"
+	step "enter \"#{name}\" in \"workspace name\""
+	step "click the \"create workspace button\""
 end
 
 # when
@@ -125,7 +145,7 @@ When /^#{I}click the #{STRING_RE}$/ do |name|
 	button.click
 end
 
-When /^I enter #{STRING_RE} in #{STRING_RE}$/ do |value, name|
+When /^#{I}enter #{STRING_RE} in #{STRING_RE}$/ do |value, name|
 	field = find_element name
 	field.send_keys [ :control, "a" ]
 	field.send_keys value
@@ -185,6 +205,14 @@ Then /^the #{STRING_RE} should be displayed$/ do |name|
 	@element = find_element name
 end
 
+Then /^#{I}should see a link titled #{STRING_RE}$/ do |title|
+	@link = find_link title
+end
+
+When /^#{I}follow the link$/ do
+	@link.click
+end
+
 Then /^it should have the following fields:$/ do |table|
 	table.hashes.each do |hash|
 		name = hash["name"]
@@ -200,19 +228,19 @@ Then /^the location should be #{STRING_RE}$/ do |url|
 	simple_url.should eq url
 end
 
-Then /^I should be logged in$/ do
+Then /^#{I}should be logged in$/ do
 	find_element "logged_in"
 end
 
-Then /^I should not be logged in$/ do
+Then /^#{I}should not be logged in$/ do
 	find_element "not_logged_in"
 end
 
-Then /^I should be on the home page$/ do
+Then /^#{I}should be on the home page$/ do
 	step "the location should be \"/\""
 end
 
-Then /^I should be on the workspace page for #{STRING_RE}$/ do |workspace_name|
+Then /^#{I}should be on the workspace page for #{STRING_RE}$/ do |workspace_name|
 	local_url.should match(/^ \/ workspace \/ ([a-z]{16}) $/x)
 	driver.title.should eq("#{workspace_name} - Notes workspace")
 end

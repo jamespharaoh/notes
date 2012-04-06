@@ -63,6 +63,10 @@ handle_call ({ create_workspace, Name }, _From, State0) ->
 
 	{ reply, Ret, State1 };
 
+handle_call (stop, _From, State) ->
+
+	{ stop, normal, ok, State };
+
 handle_call (Request, _From, State) ->
 
 	{ stop, { unknown_call, Request }, State }.

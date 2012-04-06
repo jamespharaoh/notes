@@ -60,6 +60,7 @@ def driver
 	# clear state
 
 	the_driver.manage.delete_all_cookies
+	the_driver.get "#{$url}/test/reset"
 	the_driver.get "about:blank"
 
 	# and return

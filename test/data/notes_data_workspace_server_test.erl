@@ -20,14 +20,6 @@
 -define (TARGET,
 	notes_data_workspace_server).
 
-% match functions
-
-match_str (String) ->
-
-	fun (Arg) ->
-		lists:flatten (Arg) == lists:flatten (String)
-		end.
-
 % fixtures
 
 workspace_id () ->
@@ -81,15 +73,15 @@ init_test () ->
 	?EXPECT,
 
 		em:strict (Em, notes_store, read,
-			[ match_str ("workspaces/workspace_0/workspace") ],
+			[ notes_test:match_str ("workspaces/workspace_0/workspace") ],
 			{ return, { ok, [ workspace_fixture () ] } }),
 
 		em:strict (Em, notes_store, read,
-			[ match_str ("workspaces/workspace_0/notes") ],
+			[ notes_test:match_str ("workspaces/workspace_0/notes") ],
 			{ return, { ok, notes_fixture () } }),
 
 		em:strict (Em, notes_store, read,
-			[ match_str ("workspaces/workspace_0/perms") ],
+			[ notes_test:match_str ("workspaces/workspace_0/perms") ],
 			{ return, { ok, perms_fixture () } }),
 
 	?REPLAY,
@@ -115,15 +107,15 @@ init_new_test () ->
 	?EXPECT,
 
 		em:strict (Em, notes_store, read,
-			[ match_str ("workspaces/workspace_0/workspace") ],
+			[ notes_test:match_str ("workspaces/workspace_0/workspace") ],
 			{ return, { ok, [ ] } }),
 
 		em:strict (Em, notes_store, read,
-			[ match_str ("workspaces/workspace_0/notes") ],
+			[ notes_test:match_str ("workspaces/workspace_0/notes") ],
 			{ return, { ok, [ ] } }),
 
 		em:strict (Em, notes_store, read,
-			[ match_str ("workspaces/workspace_0/perms") ],
+			[ notes_test:match_str ("workspaces/workspace_0/perms") ],
 			{ return, { ok, [ ] } }),
 
 	?REPLAY,
@@ -184,12 +176,12 @@ handle_call_create_success_test () ->
 	?EXPECT,
 
 		em:strict (Em, notes_store, write,
-			[	match_str ("workspaces/workspace_0/workspace"),
+			[	notes_test:match_str ("workspaces/workspace_0/workspace"),
 				[ NewWorkspace ] ],
 			{ return, ok }),
 
 		em:strict (Em, notes_store, write,
-			[	match_str ("workspaces/workspace_0/perms"),
+			[	notes_test:match_str ("workspaces/workspace_0/perms"),
 				NewPerms ],
 			{ return, ok }),
 
@@ -310,7 +302,7 @@ handle_call_add_note_success_test () ->
 			{ return, "note_id" }),
 
 		em:strict (Em, notes_store, write,
-			[	match_str ("workspaces/workspace_0/notes"),
+			[	notes_test:match_str ("workspaces/workspace_0/notes"),
 				NewNotes ],
 			{ return, ok }),
 
@@ -481,7 +473,7 @@ handle_call_set_note_ok_test () ->
 	?EXPECT,
 
 		em:strict (Em, notes_store, write,
-			[	match_str ("workspaces/workspace_0/notes"),
+			[	notes_test:match_str ("workspaces/workspace_0/notes"),
 				NewNotes ],
 			{ return, ok }),
 
@@ -551,7 +543,7 @@ handle_call_delete_note_ok_test () ->
 	?EXPECT,
 
 		em:strict (Em, notes_store, write,
-			[	match_str ("workspaces/workspace_0/notes"),
+			[	notes_test:match_str ("workspaces/workspace_0/notes"),
 				NewNotes ],
 			{ return, ok }),
 

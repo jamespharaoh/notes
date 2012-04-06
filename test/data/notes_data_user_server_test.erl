@@ -20,14 +20,6 @@
 -define (TARGET,
 	notes_data_user_server).
 
-% match functions
-
-match_str (String) ->
-
-	fun (Arg) ->
-		lists:flatten (Arg) == lists:flatten (String)
-		end.
-
 % fixtures
 
 state_fixture () ->
@@ -54,7 +46,7 @@ init_test () ->
 
 		em:strict (Em, notes_store, read,
 
-			[ match_str ([
+			[ notes_test:match_str ([
 				"users/",
 				notes_misc:sha1 ("user_0"),
 				"/workspaces" ]) ],
@@ -137,7 +129,7 @@ handle_call_create_workspace_test () ->
 
 		em:strict (Em, notes_store, write,
 
-			[	match_str ([
+			[	notes_test:match_str ([
 					"users/",
 					notes_misc:sha1 ("user_0"),
 					"/workspaces" ]),

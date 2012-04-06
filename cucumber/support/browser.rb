@@ -17,6 +17,8 @@ end
 
 STRING_RE = /"([^"]*)"/
 
+I_HAVE = / (?: I\shave\s | I\sam\s | have\s | am\s | )?/x
+
 def driver
 
 	# return if ready now
@@ -41,13 +43,17 @@ end
 
 # given
 
-Given /^(?:I have )?opened the home page$/ do
+Given /^#{I_HAVE}opened the home page$/ do
 	driver.get "#{$url}/"
 end
 
-Given /^(?:I have )?located the #{STRING_RE}/ do |id|
-	$element = driver.find_element :class_name, wfid(id)
-	$element.should_not be_nil
+Given /^#{I_HAVE}located the #{STRING_RE}/ do |id|
+	@element = driver.find_element :class_name, wfid(id)
+	@element.should_not be_nil
+end
+
+Given /^#{I_HAVE}logged in$/ do
+	step "log in via openid"
 end
 
 # when
@@ -57,13 +63,37 @@ When /^(?:I )?open the home page$/ do
 end
 
 Given /^(?:I )?locate the #{STRING_RE}/ do |id|
-	$element = driver.find_element :class_name, wfid(id)
-	$element.should_not be_nil
+	@element = driver.find_element :class_name, wfid(id)
+	@element.should_not be_nil
+end
+
+def find_element name
+
+	# search under our context element first
+
+	begin
+		if @element
+			elements = @element.find_elements :class_name, wfid(name)
+			raise "Multiple matches" if elements.size > 1
+			return elements[0] unless elements.empty?
+		end
+	rescue Selenium::WebDriver::Error::StaleElementReferenceError
+		@element = nil
+	end
+
+	# then try a page wide search
+
+	elements = driver.find_elements :class_name, wfid(name)
+	raise "Multiple matches" if elements.size > 1
+	return elements[0] unless elements.empty?
+
+	# raise an error
+
+	raise "Can't find element: #{name}"
 end
 
 When /^(?:I )?click the #{STRING_RE}$/ do |name|
-	button = $element.find_element :class_name, wfid(name)
-	button.should_not be_nil
+	button = find_element name
 	button.click
 end
 
@@ -71,14 +101,14 @@ When /^(?:I )?fill in the following fields:$/ do |table|
 	table.hashes.each do |hash|
 		name = hash["name"]
 		value = hash["value"]
-		field = $element.find_element :class_name, wfid(name)
+		field = @element.find_element :class_name, wfid(name)
 		field.should_not be_nil
 		field.send_keys [ :control, "a" ]
 		field.send_keys value
 	end
 end
 
-When /^I log in via openid$/ do
+When /^(?:I )?log in via openid$/ do
 
 	step "open the home page"
 	step "locate the \"login form\""
@@ -113,28 +143,23 @@ When /^I log in via openid$/ do
 
 end
 
-When /^the openid password #{STRING_RE}$/ do |value|
-end
-
-When /^(?:I )?submit the openid form$/ do
-end
-
-When /^(?:I )?wait for the page to load$/ do
-	#driver.wait_for_page
+When /^I log out$/ do
+	button = driver.find_element :class, "logout_button"
+	button.click
 end
 
 # then
 
 Then /^the #{STRING_RE} should be displayed$/ do |name|
-	$element = driver.find_element :class_name, wfid(name)
-	$element.should_not be_nil
+	@element = driver.find_element :class_name, wfid(name)
+	@element.should_not be_nil
 end
 
 Then /^it should have the following fields:$/ do |table|
 	table.hashes.each do |hash|
 		name = hash["name"]
 		expect = hash["value"]
-		field = $element.find_element :class_name, wfid(name)
+		field = @element.find_element :class_name, wfid(name)
 		field.should_not be_nil
 		actual = field.attribute("value")
 		actual.should eq(expect)

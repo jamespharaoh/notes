@@ -27,6 +27,7 @@ def local_url
 end
 
 STRING_RE = /"([^"]*)"/
+ANY_RE = /(.+)/
 
 I_HAVE = / (?: I\shave\s | I\sam\s | have\s | am\s | )?/x
 I = / (?: I\s | )?/x
@@ -113,8 +114,8 @@ end
 
 # given
 
-Given /^#{I_HAVE}opened the home page$/ do
-	driver.get "#{$url}/"
+Given /^#{I_HAVE}opened #{ANY_RE}$/ do |page|
+	step "open #{page}"
 end
 
 Given /^#{I_HAVE}located the #{STRING_RE}/ do |name|
@@ -126,15 +127,34 @@ Given /^#{I_HAVE}logged in$/ do
 end
 
 Given /^#{I_HAVE}created a workspace named #{STRING_RE}$/ do |name|
+	step "create a workspace named \"#{name}\""
+end
+
+# when
+
+When /^#{I}create a workspace named #{STRING_RE}$/ do |name|
 	step "open the home page"
 	step "enter \"#{name}\" in \"workspace name\""
 	step "click the \"create workspace button\""
 end
 
-# when
+When /^#{I}open the page at #{STRING_RE}/ do |path|
+	driver.get "#{$url}#{path}"
+end
 
 When /^#{I}open the home page$/ do
-	driver.get "#{$url}/"
+	step "open the page at \"/\""
+end
+
+def next_id
+	$next_id ||= 0
+	ret = $next_id
+	$next_id += 1
+	return ret
+end
+
+When /^#{I}open a workspace$/ do
+	step "create a workspace named \"Test workspace \""
 end
 
 Given /^#{I}locate the #{STRING_RE}/ do |name|

@@ -22,6 +22,7 @@ loginout () ->
 				#button {
 					id = log_out_button,
 					text = "Log out",
+					delegate = common,
 					postback = logout }
 			}
 

@@ -3,10 +3,15 @@ Feature: Log out
   As a user
   I need to be able to log out
 
-  Scenario: Log out
+  Scenario Outline: Log out
 
     Given I am logged in
-    And have opened the home page
+    And have opened <from page>
     When I click the "log out button"
     Then I should be on the home page
     And I should not be logged in
+
+    Examples:
+      | from page     |
+      | the home page |
+      | a workspace   |

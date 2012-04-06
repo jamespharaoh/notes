@@ -207,8 +207,4 @@ event ({ login, FormId }) ->
 			ReturnTo,
 			Realm),
 
-	wf:redirect (AuthUrl);
-
-event (Event) ->
-
-	common:event (Event).
+	wf:redirect (AuthUrl).

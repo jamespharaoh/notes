@@ -1,4 +1,3 @@
-@wip
 Feature: Access workspace
   To access my notes
   As a user

@@ -23,7 +23,7 @@ run: compile
 		-pa ebin deps/*/ebin deps/*/include \
 		-name notes@127.0.0.1 \
 		-config notes.config \
-		-eval "application:start (notes)."
+		-eval "notes_start:run ()."
 
 erl: compile
 	erl \

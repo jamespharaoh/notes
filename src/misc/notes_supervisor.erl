@@ -7,57 +7,34 @@
 	init/1,
 	loop/1 ]).
 
-%% =============================================================== api functions
+-include ("notes_global.hrl").
+
+% api functions
 
 start_link () ->
 
-	supervisor:start_link (
+	notes_delegate_supervisor:start_link (
 		{ local, ?MODULE },
 		?MODULE,
 		[ ]).
 
-%% ======================================================== supervisor callbacks
+% supervisor callbacks
 
 init ([]) ->
 
-	% start process registry
-
-	application:start (nprocreg),
-
-	% start mochiweb
-
-	application:load (mochiweb),
+	% mochiweb
 
 	{ ok, BindAddress } =
-		application:get_env (bind_address),
+		notes_config:get (bind_address),
 
 	{ ok, Port } =
-		application:get_env (port),
+		notes_config:get (port),
 
-	{ ok, ServerName } =
-		application:get_env (server_name),
-
-	Options = [
-		{ name, ServerName },
+	MochiOptions = [
 		{ ip, BindAddress },
 		{ port, Port },
 		{ loop, fun ?MODULE:loop/1 }
 	],
-
-	{ ok, _MochiPid } = mochiweb_http:start (Options),
-
-	% start openid
-
-	ok = application:start (crypto),
-	ok = application:start (ibrowse),
-	ok = application:start (openid),
-	ok = application:start (public_key),
-	ok = application:start (ssl),
-
-	% start nitrogen
-
-	ok = application:start (sasl),
-	ok = application:start (nitrogen_core),
 
 	% and return
 
@@ -67,19 +44,19 @@ init ([]) ->
 
 	ChildSpecs = [
 
-		%{	data,
-		%	{ data, start_link, [] },
-		%	permanent,
-		%	10000,
-		%	worker,
-		%	[ data ] },
+		{	mochiweb,
+			{ mochiweb_http, start_link, [ MochiOptions ] },
+			permanent,
+			10000,
+			worker,
+			[ mochiweb_http ] },
 
 		{	openid,
 			{ openid_srv, start_link, [ openid ] },
 			permanent,
 			10000,
 			worker,
-			[ openid ] }
+			[ openid_srv ] }
 	],
 
 	SupervisorOptions = { RestartPolicy, ChildSpecs },
@@ -89,7 +66,7 @@ init ([]) ->
 loop (Req) ->
 
 	{ ok, DocRoot } =
-		application:get_env (document_root),
+		notes_config:get (document_root),
 
 	RequestBridge =
 		simple_bridge:make_request (

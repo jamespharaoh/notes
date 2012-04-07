@@ -3,8 +3,8 @@
 -define (EXPECT,
 	Em = em:new (),
 	lists:foreach (
-		fun (Module) ->
-			em:nothing (Em, Module)
+		fun (NotesTestModule) ->
+			em:nothing (Em, NotesTestModule)
 			end,
 		?MOCK_MODULES)).
 

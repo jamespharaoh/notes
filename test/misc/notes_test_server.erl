@@ -23,7 +23,7 @@
 start_link (Name, Target) ->
 
 	gen_server:start_link (
-		{ local, Name },
+		Name,
 		?MODULE,
 		[ Target ],
 		[]).

@@ -17,7 +17,7 @@ prepare_test () ->
 
 	{ ok, Server } =
 		notes_test_server:start_link (
-			openid,
+			{ local, openid },
 			notes_test_server_target),
 
 	?EXPECT,
@@ -55,7 +55,7 @@ verify_test () ->
 
 	{ ok, Server } =
 		notes_test_server:start_link (
-			openid,
+			{ local, openid },
 			notes_test_server_target),
 
 	?EXPECT,

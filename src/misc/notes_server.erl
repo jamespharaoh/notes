@@ -14,10 +14,10 @@ get_pid (Mod, Id) ->
 	Name = { Mod, Id },
 
 	case gen_server:start_link (
-		{ global, Name },
-		Mod,
-		[ Id ],
-		[]) of
+			{ global, Name },
+			Mod,
+			[ Id ],
+			[]) of
 
 		{ error, { already_started, Pid }} ->
 			Pid;

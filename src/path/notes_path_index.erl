@@ -3,6 +3,7 @@
 -include_lib ("nitrogen_core/include/wf.hrl").
 
 -include ("notes_data.hrl").
+-include ("notes_global.hrl").
 
 -compile (export_all).
 
@@ -35,7 +36,7 @@ do_login () ->
 	{ ok, BaseUrl } =
 		notes_config:get (base_url),
 
-	SessionId = notes_wf:session_id (),
+	SessionId = wf:session_id (),
 	ReturnTo = BaseUrl,
 
 	Params = wf:params (),

@@ -9,7 +9,6 @@
 
 -define (MOCK_MODULES, [
 	notes_config,
-	notes_wf,
 	openid,
 	wf ]).
 
@@ -62,12 +61,12 @@ event_login_test () ->
 			[ "form_id.openid_url" ],
 			{ return, "open id url" }),
 
-		em:strict (Em, notes_wf, session_id,
+		em:strict (Em, wf, session_id,
 			[ ],
-			{ return, "session id" }),
+			{ return, <<"session id">> }),
 
 		em:strict (Em, notes_openid, prepare,
-			[ "session id", "open id url", true ],
+			[ <<"session id">>, "open id url", true ],
 			{ return, { ok, "auth req" } }),
 
 		em:strict (Em, notes_config, get,

@@ -36,7 +36,7 @@ event ({ login, FormId }) ->
 		wf:q (FormId ++ ".openid_url"),
 
 	SessionId =
-		notes_wf:session_id (),
+		wf:session_id (),
 
 	{ ok, AuthReq } =
 		notes_openid:prepare (

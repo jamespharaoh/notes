@@ -13,7 +13,6 @@
 	notes_layout_workspace_create,
 	notes_layout_workspace_list,
 	notes_openid,
-	notes_wf,
 	wf ]).
 
 -define (TARGET,
@@ -51,16 +50,16 @@ main_openid_test () ->
 			[ base_url ],
 			{ return, { ok, "base url" } }),
 
-		em:strict (Em, notes_wf, session_id,
+		em:strict (Em, wf, session_id,
 			[ ],
-			{ return, "session id" }),
+			{ return, <<"session id">> }),
 
 		em:strict (Em, wf, params,
 			[ ],
 			{ return, Params }),
 
 		em:strict (Em, notes_openid, verify,
-			[ "session id", "base url", Params ],
+			[ <<"session id">>, "base url", Params ],
 			{ return, { ok, "identity" } }),
 
 		em:strict (Em, wf, user,

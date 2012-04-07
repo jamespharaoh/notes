@@ -8,7 +8,7 @@
 	create_workspace/2,
 	stop/1 ]).
 
--include ("data.hrl").
+-include ("notes_data.hrl").
 
 -define (TARGET,
 	notes_data_user_server).

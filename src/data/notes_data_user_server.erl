@@ -13,7 +13,7 @@
 	terminate/2,
 	code_change/3 ]).
 
--include ("data.hrl").
+-include ("notes_data.hrl").
 
 % callbacks
 

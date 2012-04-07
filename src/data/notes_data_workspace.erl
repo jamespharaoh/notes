@@ -16,7 +16,7 @@
 
 ]).
 
--include ("data.hrl").
+-include ("notes_data.hrl").
 
 -define (TARGET,
 	notes_data_workspace_server).

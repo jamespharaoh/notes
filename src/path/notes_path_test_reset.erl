@@ -3,7 +3,7 @@
 -include_lib ("kernel/include/file.hrl").
 -include_lib ("nitrogen_core/include/wf.hrl").
 
--include ("data.hrl").
+-include ("notes_data.hrl").
 
 -compile (export_all).
 

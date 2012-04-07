@@ -2,7 +2,7 @@
 
 -include_lib ("eunit/include/eunit.hrl").
 
--include ("data.hrl").
+-include ("notes_data.hrl").
 
 % macros
 

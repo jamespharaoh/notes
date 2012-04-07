@@ -2,7 +2,7 @@
 
 -include_lib ("nitrogen_core/include/wf.hrl").
 
--include ("data.hrl").
+-include ("notes_data.hrl").
 
 -compile (export_all).
 
@@ -24,7 +24,7 @@ layout () ->
 				#button {
 					class = ok_button,
 					text = "Ok",
-					delegate = notes_layout_login,
+					delegate = ?MODULE,
 					postback = { login, FormId } }
 
 			] }
@@ -39,12 +39,13 @@ event ({ login, FormId }) ->
 		notes_wf:session_id (),
 
 	{ ok, AuthReq } =
-		gen_server:call (
-			openid,
-			{ prepare, SessionId, OpenIdUrl, true }),
+		notes_openid:prepare (
+			SessionId,
+			OpenIdUrl,
+			true),
 
 	{ ok, BaseUrl } =
-		application:get_env (base_url),
+		notes_config:get (base_url),
 
 	ReturnTo = BaseUrl,
 	Realm = BaseUrl,

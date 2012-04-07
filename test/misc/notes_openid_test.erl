@@ -46,3 +46,41 @@ prepare_test () ->
 	?VERIFY,
 
 	ok = notes_test_server:stop (Server).
+
+verify_test () ->
+
+	Params = [
+		{ "param key", "param value" }
+	],
+
+	{ ok, Server } =
+		notes_test_server:start_link (
+			openid,
+			notes_test_server_target),
+
+	?EXPECT,
+
+		em:strict (Em, notes_test_server_target, handle_call,
+
+			[	{	verify,
+					"session id",
+					"return to",
+					Params },
+				em:any () ],
+
+			{ return, ok }),
+
+	?REPLAY,
+
+		?assertEqual (
+
+			ok,
+
+			?TARGET:verify (
+				"session id",
+				"return to",
+				Params)),
+
+	?VERIFY,
+
+	ok = notes_test_server:stop (Server).

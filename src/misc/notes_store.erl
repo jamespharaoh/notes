@@ -24,7 +24,7 @@ read (Path) ->
 
 	% read records
 
-	case notes_delegate_file:consult (FullPath) of
+	case ?file:consult (FullPath) of
 
 		{ ok, Records } ->
 
@@ -47,12 +47,12 @@ write (Path, Records) ->
 	% make sure directory exists
 
 	ok =
-		notes_delegate_filelib:ensure_dir (FullPath),
+		?filelib:ensure_dir (FullPath),
 
 	% open file
 
 	{ ok, IoDevice } =
-		notes_delegate_file:open (FullPath, [ write ]),
+		?file:open (FullPath, [ write ]),
 
 	% write records
 
@@ -61,7 +61,7 @@ write (Path, Records) ->
 		fun (Record) ->
 
 			ok =
-				notes_delegate_io:fwrite (
+				?io:fwrite (
 					IoDevice,
 					"~p.~n",
 					[ Record ])
@@ -73,7 +73,7 @@ write (Path, Records) ->
 	% close file
 
 	ok =
-		notes_delegate_file:close (IoDevice),
+		?file:close (IoDevice),
 
 	% return
 

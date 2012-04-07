@@ -13,7 +13,7 @@
 
 start_link () ->
 
-	notes_delegate_supervisor:start_link (
+	?supervisor:start_link (
 		{ local, ?MODULE },
 		?MODULE,
 		[ ]).

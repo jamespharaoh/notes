@@ -33,7 +33,7 @@ body_class () ->
 do_login () ->
 
 	{ ok, BaseUrl } =
-		application:get_env (base_url),
+		notes_config:get (base_url),
 
 	SessionId = notes_wf:session_id (),
 	ReturnTo = BaseUrl,
@@ -41,9 +41,10 @@ do_login () ->
 	Params = wf:params (),
 
 	{ ok, Identity } =
-		gen_server:call (
-			openid,
-			{ verify, SessionId, ReturnTo, Params }),
+		notes_openid:verify (
+			SessionId,
+			ReturnTo,
+			Params),
 
 	wf:user (Identity),
 

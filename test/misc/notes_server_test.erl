@@ -20,13 +20,22 @@ call_new_process_test () ->
 	?EXPECT,
 
 		em:strict (Em, ?STUB, handle_call,
-			[ Message, em:any () ],
-			{ return, ok }),
+
+			[	Message,
+				em:any (),
+				em:any () ],
+
+			{	function,
+				fun ([ _Message, _From, State ]) ->
+					{ reply, ok, State }
+					end }),
 
 	?REPLAY,
 
 		?assertEqual (
+
 			ok,
+
 			?TARGET:call (
 				?SERVER,
 				?STUB,
@@ -49,13 +58,22 @@ call_existing_process_test () ->
 	?EXPECT,
 
 		em:strict (Em, ?STUB, handle_call,
-			[ Message, em:any () ],
-			{ return, ok }),
+
+			[	Message,
+				em:any (),
+				em:any () ],
+
+			{	function,
+				fun ([ _Message, _From, State ]) ->
+					{ reply, ok, State }
+					end }),
 
 	?REPLAY,
 
 		?assertEqual (
+
 			ok,
+
 			?TARGET:call (
 				?SERVER,
 				?STUB,

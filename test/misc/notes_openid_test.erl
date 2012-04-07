@@ -28,9 +28,13 @@ prepare_test () ->
 					"session id",
 					"open id url",
 					true },
+				em:any (),
 				em:any () ],
 
-			{ return, ok }),
+			{ function,
+				fun ([ _Message, _From, State ]) ->
+					{ reply, ok, State }
+					end }),
 
 	?REPLAY,
 
@@ -66,9 +70,13 @@ verify_test () ->
 					"session id",
 					"return to",
 					Params },
+				em:any (),
 				em:any () ],
 
-			{ return, ok }),
+			{ function,
+				fun ([ _Message, _From, State ]) ->
+					{ reply, ok, State }
+					end }),
 
 	?REPLAY,
 

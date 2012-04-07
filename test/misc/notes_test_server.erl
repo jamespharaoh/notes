@@ -46,12 +46,7 @@ handle_call (stop, _From, Target) ->
 
 handle_call (Request, From, Target) ->
 
-	case Target:handle_call (Request, From) of
-
-		ok ->
-			{ reply, ok, Target }
-
-	end.
+	Target:handle_call (Request, From, Target).
 
 handle_cast (Message, Target) ->
 

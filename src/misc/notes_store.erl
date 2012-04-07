@@ -2,19 +2,17 @@
 
 -export ([
 	read/1,
-	write/2 ]).
+	write/2,
+	delete_all/0 ]).
 
 -ifdef (TEST).
-
-full_path (Path) ->
-	[ "test/", Path ].
-
+-define (DIR, "test").
 -else.
+-define (DIR, "data").
+-endif.
 
 full_path (Path) ->
-	[ "data/", Path ].
-
--endif.
+	[ ?DIR, "/", Path ].
 
 % public api
 
@@ -70,3 +68,7 @@ write (Path, Records) ->
 	% return
 
 	ok.
+
+delete_all () ->
+
+	notes_file:delete_dir (?DIR).

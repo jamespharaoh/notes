@@ -14,7 +14,7 @@ get_test () ->
 
 	?EXPECT,
 
-		em:strict (Em, application, get_env,
+		?expect (application, get_env,
 			[ key ],
 			{ return, value }),
 

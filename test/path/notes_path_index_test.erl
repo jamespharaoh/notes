@@ -22,7 +22,7 @@ main_normal_test () ->
 
 	?EXPECT,
 
-		em:strict (Em, wf, q,
+		?expect (wf, q,
 			[ "openid.ns" ],
 			{ return, undefined }),
 
@@ -42,31 +42,31 @@ main_openid_test () ->
 
 	?EXPECT,
 
-		em:strict (Em, wf, q,
+		?expect (wf, q,
 			[ "openid.ns" ],
 			{ return, "open id namespace" }),
 
-		em:strict (Em, notes_config, get,
+		?expect (notes_config, get,
 			[ base_url ],
 			{ return, { ok, "base url" } }),
 
-		em:strict (Em, wf, session_id,
+		?expect (wf, session_id,
 			[ ],
 			{ return, <<"session id">> }),
 
-		em:strict (Em, wf, params,
+		?expect (wf, params,
 			[ ],
 			{ return, Params }),
 
-		em:strict (Em, notes_openid, verify,
+		?expect (notes_openid, verify,
 			[ <<"session id">>, "base url", Params ],
 			{ return, { ok, "identity" } }),
 
-		em:strict (Em, wf, user,
+		?expect (wf, user,
 			[ "identity" ],
 			{ return, ok }),
 
-		em:strict (Em, wf, redirect,
+		?expect (wf, redirect,
 			[ "/" ],
 			{ return, ok }),
 
@@ -82,7 +82,7 @@ body_class_not_logged_in_test () ->
 
 	?EXPECT,
 
-		em:strict (Em, wf, user,
+		?expect (wf, user,
 			[ ],
 			{ return, undefined }),
 
@@ -98,7 +98,7 @@ body_class_logged_in_test () ->
 
 	?EXPECT,
 
-		em:strict (Em, wf, user,
+		?expect (wf, user,
 			[ ],
 			{ return, "user id" }),
 
@@ -120,11 +120,11 @@ layout_not_logged_in_test () ->
 
 	?EXPECT,
 
-		em:strict (Em, wf, user,
+		?expect (wf, user,
 			[ ],
 			{ return, undefined }),
 
-		em:strict (Em, notes_layout_login, layout,
+		?expect (notes_layout_login, layout,
 			[ ],
 			{ return, "login layout" }),
 
@@ -140,15 +140,15 @@ layout_logged_in_test () ->
 
 	?EXPECT,
 
-		em:strict (Em, wf, user,
+		?expect (wf, user,
 			[ ],
 			{ return, "user id" }),
 
-		em:strict (Em, notes_layout_workspace_create, layout,
+		?expect (notes_layout_workspace_create, layout,
 			[ ],
 			{ return, "workspace create layout" }),
 
-		em:strict (Em, notes_layout_workspace_list, layout,
+		?expect (notes_layout_workspace_list, layout,
 			[ ],
 			{ return, "workspace list layout" }),
 

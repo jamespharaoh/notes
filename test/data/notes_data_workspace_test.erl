@@ -1,11 +1,12 @@
 -module (notes_data_workspace_test).
 
+-include ("notes_global.hrl").
 -include ("notes_test.hrl").
 
 % macros
 
--define (MOCK_MODULES,
-	[ notes_server ]).
+-define (MOCK_MODULES, [
+	notes_server ]).
 
 -define (TARGET,
 	notes_data_workspace).

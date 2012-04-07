@@ -22,7 +22,7 @@ prepare_test () ->
 
 	?EXPECT,
 
-		em:strict (Em, notes_test_server_target, handle_call,
+		?expect (notes_test_server_target, handle_call,
 
 			[	{	prepare,
 					"session id",
@@ -64,7 +64,7 @@ verify_test () ->
 
 	?EXPECT,
 
-		em:strict (Em, notes_test_server_target, handle_call,
+		?expect (notes_test_server_target, handle_call,
 
 			[	{	verify,
 					"session id",

@@ -3,18 +3,13 @@
 -include_lib ("eunit/include/eunit.hrl").
 
 -include ("notes_data.hrl").
+-include ("notes_global.hrl").
+-include ("notes_test.hrl").
 
 % macros
 
--define (EXPECT,
-	Em = em:new (),
-	em:nothing (Em, notes_supervisor)).
-
--define (REPLAY,
-	em:replay (Em)).
-
--define (VERIFY,
-	em:verify (Em)).
+-define (MOCK_MODULES, [
+	notes_supervisor ]).
 
 -define (TARGET,
 	notes_data_workspace_server).
@@ -28,7 +23,7 @@ start_test () ->
 
 	?EXPECT,
 
-		em:strict (Em, notes_supervisor, start_link,
+		?expect (notes_supervisor, start_link,
 			[ ],
 			{ return, ok }),
 

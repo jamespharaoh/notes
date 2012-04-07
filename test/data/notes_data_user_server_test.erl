@@ -3,19 +3,14 @@
 -include_lib ("eunit/include/eunit.hrl").
 
 -include ("notes_data.hrl").
+-include ("notes_global.hrl").
+-include ("notes_test.hrl").
 
 % macros
 
--define (EXPECT,
-	Em = em:new (),
-	em:nothing (Em, notes_random),
-	em:nothing (Em, notes_store)).
-
--define (REPLAY,
-	em:replay (Em)).
-
--define (VERIFY,
-	em:verify (Em)).
+-define (MOCK_MODULES, [
+	notes_random,
+	notes_store ]).
 
 -define (TARGET,
 	notes_data_user_server).
@@ -44,7 +39,7 @@ init_test () ->
 
 	?EXPECT,
 
-		em:strict (Em, notes_store, read,
+		?expect (notes_store, read,
 
 			[ notes_test:match_str ([
 				"users/",
@@ -124,10 +119,10 @@ handle_call_create_workspace_test () ->
 
 	?EXPECT,
 
-		em:strict (Em, notes_random, random_id, [ ],
+		?expect (notes_random, random_id, [ ],
 			{ return, "workspace_z" }),
 
-		em:strict (Em, notes_store, write,
+		?expect (notes_store, write,
 
 			[	notes_test:match_str ([
 					"users/",

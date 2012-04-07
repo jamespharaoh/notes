@@ -3,19 +3,14 @@
 -include_lib ("eunit/include/eunit.hrl").
 
 -include ("notes_data.hrl").
+-include ("notes_global.hrl").
+-include ("notes_test.hrl").
 
 % macros
 
--define (EXPECT,
-	Em = em:new (),
-	em:nothing (Em, notes_random),
-	em:nothing (Em, notes_store)).
-
--define (REPLAY,
-	em:replay (Em)).
-
--define (VERIFY,
-	em:verify (Em)).
+-define (MOCK_MODULES, [
+	notes_random,
+	notes_store ]).
 
 -define (TARGET,
 	notes_data_workspace_server).
@@ -72,15 +67,15 @@ init_test () ->
 
 	?EXPECT,
 
-		em:strict (Em, notes_store, read,
+		?expect (notes_store, read,
 			[ notes_test:match_str ("workspaces/workspace_0/workspace") ],
 			{ return, { ok, [ workspace_fixture () ] } }),
 
-		em:strict (Em, notes_store, read,
+		?expect (notes_store, read,
 			[ notes_test:match_str ("workspaces/workspace_0/notes") ],
 			{ return, { ok, notes_fixture () } }),
 
-		em:strict (Em, notes_store, read,
+		?expect (notes_store, read,
 			[ notes_test:match_str ("workspaces/workspace_0/perms") ],
 			{ return, { ok, perms_fixture () } }),
 
@@ -106,15 +101,15 @@ init_new_test () ->
 
 	?EXPECT,
 
-		em:strict (Em, notes_store, read,
+		?expect (notes_store, read,
 			[ notes_test:match_str ("workspaces/workspace_0/workspace") ],
 			{ return, { ok, [ ] } }),
 
-		em:strict (Em, notes_store, read,
+		?expect (notes_store, read,
 			[ notes_test:match_str ("workspaces/workspace_0/notes") ],
 			{ return, { ok, [ ] } }),
 
-		em:strict (Em, notes_store, read,
+		?expect (notes_store, read,
 			[ notes_test:match_str ("workspaces/workspace_0/perms") ],
 			{ return, { ok, [ ] } }),
 
@@ -175,12 +170,12 @@ handle_call_create_success_test () ->
 
 	?EXPECT,
 
-		em:strict (Em, notes_store, write,
+		?expect (notes_store, write,
 			[	notes_test:match_str ("workspaces/workspace_0/workspace"),
 				[ NewWorkspace ] ],
 			{ return, ok }),
 
-		em:strict (Em, notes_store, write,
+		?expect (notes_store, write,
 			[	notes_test:match_str ("workspaces/workspace_0/perms"),
 				NewPerms ],
 			{ return, ok }),
@@ -298,10 +293,10 @@ handle_call_add_note_success_test () ->
 
 	?EXPECT,
 
-		em:strict (Em, notes_random, random_id, [ ],
+		?expect (notes_random, random_id, [ ],
 			{ return, "note_id" }),
 
-		em:strict (Em, notes_store, write,
+		?expect (notes_store, write,
 			[	notes_test:match_str ("workspaces/workspace_0/notes"),
 				NewNotes ],
 			{ return, ok }),
@@ -472,7 +467,7 @@ handle_call_set_note_ok_test () ->
 
 	?EXPECT,
 
-		em:strict (Em, notes_store, write,
+		?expect (notes_store, write,
 			[	notes_test:match_str ("workspaces/workspace_0/notes"),
 				NewNotes ],
 			{ return, ok }),
@@ -542,7 +537,7 @@ handle_call_delete_note_ok_test () ->
 
 	?EXPECT,
 
-		em:strict (Em, notes_store, write,
+		?expect (notes_store, write,
 			[	notes_test:match_str ("workspaces/workspace_0/notes"),
 				NewNotes ],
 			{ return, ok }),

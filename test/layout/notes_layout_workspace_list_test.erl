@@ -2,8 +2,9 @@
 
 -include_lib ("nitrogen_core/include/wf.hrl").
 
--include ("notes_test.hrl").
 -include ("notes_data.hrl").
+-include ("notes_global.hrl").
+-include ("notes_test.hrl").
 
 -compile (export_all).
 
@@ -26,11 +27,11 @@ layout_test () ->
 
 	?EXPECT,
 
-		em:strict (Em, wf, user,
+		?expect (wf, user,
 			[],
 			{ return, "user id" }),
 
-		em:strict (Em, notes_data_user, get_workspaces,
+		?expect (notes_data_user, get_workspaces,
 			[ "user id" ],
 			{ return, { ok, Workspaces }}),
 

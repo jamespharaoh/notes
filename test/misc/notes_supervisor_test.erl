@@ -6,6 +6,7 @@
 % macros
 
 -define (MOCK_MODULES, [
+	nitrogen,
 	notes_config,
 	notes_delegate_supervisor,
 	simple_bridge ]).
@@ -20,7 +21,7 @@ start_link_test () ->
 
 	?EXPECT,
 
-		em:strict (Em, notes_delegate_supervisor, start_link,
+		?expect (notes_delegate_supervisor, start_link,
 			[ Name, ?TARGET, [] ],
 			{ return, ok }),
 
@@ -42,11 +43,11 @@ init_test () ->
 
 	?EXPECT,
 
-		em:strict (Em, notes_config, get,
+		?expect (notes_config, get,
 			[ bind_address ],
 			{ return, { ok, "1.2.3.4" } }),
 
-		em:strict (Em, notes_config, get,
+		?expect (notes_config, get,
 			[ port ],
 			{ return, { ok, 5678 } }),
 
@@ -83,23 +84,23 @@ loop_test () ->
 
 	?EXPECT,
 
-		em:strict (Em, notes_config, get,
+		?expect (notes_config, get,
 			[ document_root ],
 			{ return, { ok, "document root" } }),
 
-		em:strict (Em, simple_bridge, make_request,
+		?expect (simple_bridge, make_request,
 			[ mochiweb_request_bridge, { "request", "document root" } ],
 			{ return, "request bridge" }),
 
-		em:strict (Em, simple_bridge, make_response,
+		?expect (simple_bridge, make_response,
 			[ mochiweb_response_bridge, { "request", "document root" } ],
 			{ return, "response bridge" }),
 
-		em:strict (Em, nitrogen, init_request,
+		?expect (nitrogen, init_request,
 			[ "request bridge", "response bridge" ],
 			{ return, "response bridge" }),
 
-		em:strict (Em, nitrogen, run,
+		?expect (nitrogen, run,
 			[ ],
 			{ return, ok }),
 

@@ -27,23 +27,23 @@ main_test () ->
 
 	?EXPECT,
 
-		em:strict (Em, notes_global, registered_names,
+		?expect (notes_global, registered_names,
 			[],
 			{ return, Names }),
 
-		em:strict (Em, notes_data_user, stop,
+		?expect (notes_data_user, stop,
 			[ "user id" ],
 			{ return, ok }),
 
-		em:strict (Em, notes_data_workspace, stop,
+		?expect (notes_data_workspace, stop,
 			[ "workspace id" ],
 			{ return, ok }),
 
-		em:strict (Em, notes_delegate_timer, sleep,
+		?expect (notes_delegate_timer, sleep,
 			[ 1 ],
 			{ return, ok }),
 
-		em:strict (Em, notes_store, delete_all,
+		?expect (notes_store, delete_all,
 			[ ],
 			{ return, ok }),
 

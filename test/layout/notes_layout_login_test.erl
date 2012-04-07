@@ -2,13 +2,15 @@
 
 -include_lib ("nitrogen_core/include/wf.hrl").
 
--include ("notes_test.hrl").
 -include ("notes_data.hrl").
+-include ("notes_global.hrl").
+-include ("notes_test.hrl").
 
 -compile (export_all).
 
 -define (MOCK_MODULES, [
 	notes_config,
+	notes_openid,
 	openid,
 	wf ]).
 
@@ -21,7 +23,7 @@ layout_test () ->
 
 	?EXPECT,
 
-		em:strict (Em, wf, temp_id,
+		?expect (wf, temp_id,
 			[],
 			{ return, FormId }),
 
@@ -57,27 +59,27 @@ event_login_test () ->
 
 	?EXPECT,
 
-		em:strict (Em, wf, q,
+		?expect (wf, q,
 			[ "form_id.openid_url" ],
 			{ return, "open id url" }),
 
-		em:strict (Em, wf, session_id,
+		?expect (wf, session_id,
 			[ ],
 			{ return, <<"session id">> }),
 
-		em:strict (Em, notes_openid, prepare,
+		?expect (notes_openid, prepare,
 			[ <<"session id">>, "open id url", true ],
 			{ return, { ok, "auth req" } }),
 
-		em:strict (Em, notes_config, get,
+		?expect (notes_config, get,
 			[ base_url ],
 			{ return, { ok, "base url" } }),
 
-		em:strict (Em, openid, authentication_url,
+		?expect (openid, authentication_url,
 			[ "auth req", "base url", "base url" ],
 			{ return, "auth url" }),
 
-		em:strict (Em, wf, redirect,
+		?expect (wf, redirect,
 			[ "auth url" ],
 			{ return, ok }),
 

@@ -1,5 +1,6 @@
 -module (notes_data_user_test).
 
+-include ("notes_global.hrl").
 -include ("notes_test.hrl").
 
 % macros

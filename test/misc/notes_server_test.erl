@@ -5,6 +5,7 @@
 % macros
 
 -define (MOCK_MODULES, [
+	notes_test_server_stub,
 	notes_test_server_target ]).
 
 -define (TARGET, notes_server).
@@ -19,7 +20,7 @@ call_new_process_test () ->
 
 	?EXPECT,
 
-		em:strict (Em, ?STUB, handle_call,
+		?expect (?STUB, handle_call,
 
 			[	Message,
 				em:any (),
@@ -57,7 +58,7 @@ call_existing_process_test () ->
 
 	?EXPECT,
 
-		em:strict (Em, ?STUB, handle_call,
+		?expect (?STUB, handle_call,
 
 			[	Message,
 				em:any (),

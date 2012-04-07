@@ -2,8 +2,9 @@
 
 -include_lib ("nitrogen_core/include/wf.hrl").
 
--include ("notes_test.hrl").
 -include ("notes_data.hrl").
+-include ("notes_global.hrl").
+-include ("notes_test.hrl").
 
 -compile (export_all).
 
@@ -17,7 +18,7 @@ layout_with_session_test () ->
 
 	?EXPECT,
 
-		em:strict (Em, wf, user,
+		?expect (wf, user,
 			[],
 			{ return, "user id" }),
 
@@ -41,7 +42,7 @@ layout_without_session_test () ->
 
 	?EXPECT,
 
-		em:strict (Em, wf, user,
+		?expect (wf, user,
 			[],
 			{ return, undefined }),
 
@@ -63,11 +64,11 @@ event_logout_test () ->
 
 	?EXPECT,
 
-		em:strict (Em, wf, clear_user,
+		?expect (wf, clear_user,
 			[],
 			{ return, ok }),
 
-		em:strict (Em, wf, redirect,
+		?expect (wf, redirect,
 			[ "/" ],
 			{ return, ok }),
 

@@ -8,7 +8,8 @@
 -define (MOCK_MODULES, [
 	notes_delegate_file,
 	notes_delegate_filelib,
-	notes_delegate_io ]).
+	notes_delegate_io,
+	notes_file ]).
 
 -define (TARGET, notes_store).
 
@@ -16,7 +17,7 @@ read_not_found_test () ->
 
 	?EXPECT,
 
-		em:strict (Em, notes_delegate_file, consult,
+		?expect (notes_delegate_file, consult,
 			[ notes_test:match_str ("test/dir/file") ],
 			{ return, { error, enoent } }),
 
@@ -36,7 +37,7 @@ read_normal_test () ->
 
 	?EXPECT,
 
-		em:strict (Em, notes_delegate_file, consult,
+		?expect (notes_delegate_file, consult,
 			[ notes_test:match_str ("test/dir/file") ],
 			{ return, { ok, Records } }),
 
@@ -60,23 +61,23 @@ write_test () ->
 
 	?EXPECT,
 
-		em:strict (Em, notes_delegate_filelib, ensure_dir,
+		?expect (notes_delegate_filelib, ensure_dir,
 			[ notes_test:match_str ("test/dir/file") ],
 			{ return, ok }),
 
-		em:strict (Em, notes_delegate_file, open,
+		?expect (notes_delegate_file, open,
 			[ notes_test:match_str ("test/dir/file"), [ write ] ],
 			{ return, { ok, IoDevice } }),
 
-		em:strict (Em, notes_delegate_io, fwrite,
+		?expect (notes_delegate_io, fwrite,
 			[ IoDevice, "~p.~n", [ Record1 ] ],
 			{ return, ok }),
 
-		em:strict (Em, notes_delegate_io, fwrite,
+		?expect (notes_delegate_io, fwrite,
 			[ IoDevice, "~p.~n", [ Record2 ] ],
 			{ return, ok }),
 
-		em:strict (Em, notes_delegate_file, close,
+		?expect (notes_delegate_file, close,
 			[ IoDevice ],
 			{ return, ok }),
 
@@ -92,7 +93,7 @@ delete_all_test () ->
 
 	?EXPECT,
 
-		em:strict (Em, notes_file, delete_dir,
+		?expect (notes_file, delete_dir,
 			[ notes_test:match_str ("test") ],
 			{ return, ok }),
 

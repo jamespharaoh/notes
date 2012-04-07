@@ -19,7 +19,7 @@ random_id_test () ->
 
 		lists:foreach (
 			fun (Char) ->
-				em:strict (Em, crypto, rand_uniform,
+				?expect (crypto, rand_uniform,
 					[ 0, 26 ],
 					{ return, Char - $a })
 				end,

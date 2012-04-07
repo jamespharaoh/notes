@@ -5,6 +5,8 @@
 	write/2,
 	delete_all/0 ]).
 
+-include ("notes_global.hrl").
+
 -ifdef (TEST).
 -define (DIR, "test").
 -else.
@@ -22,7 +24,7 @@ read (Path) ->
 
 	% read records
 
-	case file:consult (FullPath) of
+	case notes_delegate_file:consult (FullPath) of
 
 		{ ok, Records } ->
 
@@ -44,26 +46,34 @@ write (Path, Records) ->
 
 	% make sure directory exists
 
-	filelib:ensure_dir (FullPath),
+	ok =
+		notes_delegate_filelib:ensure_dir (FullPath),
 
 	% open file
 
 	{ ok, IoDevice } =
-		file:open (FullPath, [ write ]),
+		notes_delegate_file:open (FullPath, [ write ]),
 
 	% write records
 
 	lists:foreach (
 
 		fun (Record) ->
-			io:fwrite (IoDevice, "~p.~n", [ Record ])
+
+			ok =
+				notes_delegate_io:fwrite (
+					IoDevice,
+					"~p.~n",
+					[ Record ])
+
 			end,
 
 		Records),
 
 	% close file
 
-	file:close (IoDevice),
+	ok =
+		notes_delegate_file:close (IoDevice),
 
 	% return
 

@@ -27,7 +27,7 @@ main () ->
 		0,
 		notes_global:registered_names ()),
 
-	notes_timer:sleep (1),
+	notes_delegate_timer:sleep (1),
 
 	notes_store:delete_all (),
 

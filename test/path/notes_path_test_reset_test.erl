@@ -12,8 +12,8 @@
 	notes_global,
 	notes_data_user,
 	notes_data_workspace,
-	notes_store,
-	notes_timer ]).
+	notes_delegate_timer,
+	notes_store ]).
 
 -define (TARGET,
 	notes_path_test_reset).
@@ -39,7 +39,7 @@ main_test () ->
 			[ "workspace id" ],
 			{ return, ok }),
 
-		em:strict (Em, notes_timer, sleep,
+		em:strict (Em, notes_delegate_timer, sleep,
 			[ 1 ],
 			{ return, ok }),
 

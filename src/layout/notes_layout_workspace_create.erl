@@ -43,15 +43,17 @@ event ({ create_workspace, FormId }) ->
 	WorkspaceName =
 		wf:q (FormId ++ ".workspace_name"),
 
+	UserId = wf:user (),
+
 	{ ok, Workspace } =
 		notes_data_user:create_workspace (
-			wf:user (),
+			UserId,
 			WorkspaceName),
 
 	ok =
 		notes_data_workspace:create (
 			Workspace#user_workspace.workspace_id,
-			wf:user (),
+			UserId,
 			WorkspaceName),
 
 	wf:redirect ([

@@ -87,7 +87,7 @@ deps: .deps-force .deps-flag
 
 .deps-flag: rebar rebar.config
 	./rebar get-deps
-	test -f deps/less || \
+	test -d deps/less || \
 		git clone git://github.com/cloudhead/less.js.git deps/less
 	touch .deps-flag
 

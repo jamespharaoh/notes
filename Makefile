@@ -33,11 +33,11 @@ compile: rebar .deps-flag
 # runtime
 
 run: compile
-	test -f notes.config || cp notes.config.template notes.config
+	test -f etc/notes.config || cp etc/notes.config.template etc/notes.config
 	erl \
 		-pa ebin deps/*/ebin deps/*/include \
 		-name notes@127.0.0.1 \
-		-config notes.config \
+		-config etc/notes.config \
 		-eval "notes_start:run ()."
 
 erl: compile

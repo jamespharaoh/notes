@@ -3,37 +3,47 @@
 -include_lib ("nitrogen_core/include/wf.hrl").
 
 -include ("notes_data.hrl").
+-include ("notes_global.hrl").
 
 -compile (export_all).
 
 layout () ->
 
+	#template {
+		file = "templates/login.html" }.
+
+accounts () ->
+
+	#link {
+		class = button,
+		text = "Google",
+		delegate = ?MODULE,
+		postback = { login, easy, "https://www.google.com/accounts/o8/id" }
+	}.
+
+openid () ->
+
 	FormId = wf:temp_id (),
 
-	[	#panel {
-			id = FormId,
-			class = login_form,
-			body = [
+	#span {
+		id = FormId,
+		class = login_form,
+		body = [
 
-				#h1 { text = "Notes - Please log in" },
+			#textbox {
+				id = openid_url },
 
-				#textbox {
-					id = openid_url,
-					text = "https://www.google.com/accounts/o8/id" },
+			" ",
 
-				#button {
-					class = ok_button,
-					text = "Ok",
-					delegate = ?MODULE,
-					postback = { login, FormId } }
+			#button {
+				class = ok_button,
+				text = "Ok",
+				delegate = ?MODULE,
+				postback = { login, form, FormId } }
+		]
+	}.
 
-			] }
-	].
-
-event ({ login, FormId }) ->
-
-	OpenIdUrl =
-		wf:q (FormId ++ ".openid_url"),
+login (OpenIdUrl) ->
 
 	SessionId =
 		wf:session_id (),
@@ -57,3 +67,14 @@ event ({ login, FormId }) ->
 			Realm),
 
 	wf:redirect (AuthUrl).
+
+event ({ login, easy, OpenIdUrl }) ->
+
+	login (OpenIdUrl);
+
+event ({ login, form, FormId }) ->
+
+	OpenIdUrl =
+		wf:q (FormId ++ ".openid_url"),
+
+	login (OpenIdUrl).

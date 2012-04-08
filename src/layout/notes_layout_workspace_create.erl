@@ -10,7 +10,11 @@ layout () ->
 
 	FormId = wf:temp_id (),
 
-	[	#h2 { text = "Create new workspace" },
+	#section { body = [
+
+		#html5_header { body = [
+			#h2 { text = "Create new workspace" }
+		] },
 
 		#panel {
 			id = FormId,
@@ -21,6 +25,8 @@ layout () ->
 
 					#label {
 						text = "Name" },
+
+					" ",
 
 					#textbox {
 						id = workspace_name }
@@ -34,9 +40,9 @@ layout () ->
 						delegate = ?MODULE,
 						postback = { create_workspace, FormId } }
 				] }
-
-			] }
-	].
+			]
+		}
+	] }.
 
 event ({ create_workspace, FormId }) ->
 

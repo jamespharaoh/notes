@@ -72,6 +72,8 @@ deps: .deps-force .deps-flag
 
 .deps-flag: rebar rebar.config
 	./rebar get-deps
+	test -f deps/less || \
+		git clone https://github.com/cloudhead/less.js.git deps/less
 	touch .deps-flag
 
 # bundle

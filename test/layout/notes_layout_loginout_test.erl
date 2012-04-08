@@ -26,13 +26,11 @@ layout_with_session_test () ->
 
 		?assertEqual (
 
-			#p { body =
-				#button {
-					id = log_out_button,
-					text = "Log out",
-					delegate = ?TARGET,
-					postback = logout }
-			},
+			#button {
+				id = log_out_button,
+				text = "Log out",
+				delegate = ?TARGET,
+				postback = logout },
 
 			?TARGET:layout ()),
 
@@ -50,11 +48,9 @@ layout_without_session_test () ->
 
 		?assertEqual (
 
-			#p { body =
-				#link {
-					text = "Log in",
-					url = "/" }
-			},
+			#link {
+				text = "Log in",
+				url = "/" },
 
 			?TARGET:layout ()),
 

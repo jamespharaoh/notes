@@ -19,43 +19,107 @@
 
 layout_test () ->
 
-	FormId = "form id",
-
 	?EXPECT,
-
-		?expect (wf, temp_id,
-			[],
-			{ return, FormId }),
 
 	?REPLAY,
 
 		?assertEqual (
 
-			[	#panel {
-					id = FormId,
-					class = login_form,
-					body = [
-
-						#h1 { text = "Notes - Please log in" },
-
-						#textbox {
-							id = openid_url,
-							text = "https://www.google.com/accounts/o8/id" },
-
-						#button {
-							class = ok_button,
-							text = "Ok",
-							delegate = notes_layout_login,
-							postback = { login, FormId } }
-
-					] }
-			],
+			#template {
+				file = "templates/login.html" },
 
 			?TARGET:layout ()),
 
 	?VERIFY.
 
-event_login_test () ->
+accounts_test () ->
+
+	?EXPECT,
+
+	?REPLAY,
+
+		?assertEqual (
+
+			#link {
+				class = button,
+				text = "Google",
+				delegate = ?TARGET,
+				postback = { login, easy, "https://www.google.com/accounts/o8/id" }
+			},
+
+			?TARGET:accounts ()),
+
+	?VERIFY.
+
+openid_test () ->
+
+	?EXPECT,
+
+		?expect (wf, temp_id,
+			[ ],
+			{ return, "form id" }),
+
+	?REPLAY,
+
+		?assertEqual (
+
+			#span {
+				id = "form id",
+				class = login_form,
+				body = [
+
+					#textbox {
+						id = openid_url },
+
+					" ",
+
+					#button {
+						class = ok_button,
+						text = "Ok",
+						delegate = ?TARGET,
+						postback = { login, form, "form id" } }
+				]
+			},
+
+			?TARGET:openid ()),
+
+	?VERIFY.
+
+event_login_easy_test () ->
+
+	?EXPECT,
+
+		?expect (wf, session_id,
+			[ ],
+			{ return, <<"session id">> }),
+
+		?expect (notes_openid, prepare,
+			[ <<"session id">>, "open id url", true ],
+			{ return, { ok, "auth req" } }),
+
+		?expect (notes_config, get,
+			[ base_url ],
+			{ return, { ok, "base url" } }),
+
+		?expect (openid, authentication_url,
+			[ "auth req", "base url", "base url" ],
+			{ return, "auth url" }),
+
+		?expect (wf, redirect,
+			[ "auth url" ],
+			{ return, ok }),
+
+	?REPLAY,
+
+		?assertEqual (
+
+			ok,
+
+			?TARGET:event ({ login, easy, "open id url" })),
+
+	?VERIFY.
+
+event_login_form_test () ->
 
 	?EXPECT,
 
@@ -89,6 +153,6 @@ event_login_test () ->
 
 			ok,
 
-			?TARGET:event ({ login, "form_id" })),
+			?TARGET:event ({ login, form, "form_id" })),
 
 	?VERIFY.

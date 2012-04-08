@@ -60,18 +60,22 @@ layout () ->
 
 layout_add_quick_note () ->
 
-	[	#hr { },
-
-		#h2 {
+	[	#h2 {
 			text = "Add a quick note" },
 
-		#textarea {
-			id = add_quick_text },
+		#p { body = [
 
-		#button {
-			id = add_quick_ok,
-			text = "Add",
-			postback = add_quick_ok }
+			#textarea {
+				id = add_quick_text }
+		] },
+
+		#p { body = [
+
+			#button {
+				id = add_quick_ok,
+				text = "Add note",
+				postback = add_quick_ok }
+		] }
 	].
 
 layout_view_quick_notes () ->
@@ -86,9 +90,7 @@ layout_view_quick_notes () ->
 
 		{ ok, Notes } ->
 
-			[	#hr { },
-
-				#h2 {
+			[	#h2 {
 					text = "Quick notes waiting to be processed" },
 
 				lists:map (
@@ -135,9 +137,13 @@ layout_edit_quick_note (Note, PanelId) ->
 
 	TextId = wf:temp_id (),
 
-	[	#textarea {
+	#p { body = [
+
+		#textarea {
 			id = TextId,
 			text = Note#workspace_note.text },
+
+		" ",
 
 		#button {
 			text = "Ok",
@@ -146,7 +152,7 @@ layout_edit_quick_note (Note, PanelId) ->
 				Note#workspace_note.note_id,
 				PanelId,
 				TextId } }
-	].
+	] }.
 
 event (add_quick_ok) ->
 

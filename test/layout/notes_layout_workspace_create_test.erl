@@ -28,7 +28,11 @@ layout_test () ->
 
 		?assertEqual (
 
-			[	#h2 { text = "Create new workspace" },
+			#section { body = [
+
+				#html5_header { body = [
+					#h2 { text = "Create new workspace" }
+				] },
 
 				#panel {
 					id = "form id",
@@ -39,6 +43,8 @@ layout_test () ->
 
 							#label {
 								text = "Name" },
+
+							" ",
 
 							#textbox {
 								id = workspace_name }
@@ -52,9 +58,9 @@ layout_test () ->
 								delegate = ?TARGET,
 								postback = { create_workspace, "form id" } }
 						] }
-
-					] }
-			],
+					]
+				}
+			] },
 
 			?TARGET:layout ()),
 

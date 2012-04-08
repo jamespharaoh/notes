@@ -131,7 +131,7 @@ layout_not_logged_in_test () ->
 	?REPLAY,
 
 		?assertEqual (
-			[ "login layout" ],
+			"login layout",
 			?TARGET:layout ()),
 
 	?VERIFY.
@@ -156,13 +156,9 @@ layout_logged_in_test () ->
 
 		?assertEqual (
 
-			[	#h1 { text = "Notes - Main menu" },
-
-				#hr {},
+			[	#h1 { text = "Home" },
 
 				"workspace create layout",
-
-				#hr {},
 
 				"workspace list layout"
 			],

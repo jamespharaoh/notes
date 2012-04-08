@@ -68,17 +68,13 @@ layout () ->
 
 layout_not_authenticated () ->
 
-	[ notes_layout_login:layout () ].
+	notes_layout_login:layout ().
 
 layout_authenticated () ->
 
-	[	#h1 { text = "Notes - Main menu" },
-
-		#hr {},
+	[	#h1 { text = "Home" },
 
 		notes_layout_workspace_create:layout (),
-
-		#hr {},
 
 		notes_layout_workspace_list:layout ()
 	].

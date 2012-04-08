@@ -12,21 +12,17 @@ layout () ->
 
 		undefined ->
 
-			#p { body =
-				#link {
-					text = "Log in",
-					url = "/" }
-			};
+			#link {
+				text = "Log in",
+				url = "/" };
 
 		_ ->
 
-			#p { body =
-				#button {
-					id = log_out_button,
-					text = "Log out",
-					delegate = ?MODULE,
-					postback = logout }
-			}
+			#button {
+				id = log_out_button,
+				text = "Log out",
+				delegate = ?MODULE,
+				postback = logout }
 
 		end.
 

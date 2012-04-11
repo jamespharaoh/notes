@@ -32,7 +32,7 @@ When /^#{I}open a workspace$/ do
 end
 
 When /^#{I}open the page at #{STRING_RE}/ do |path|
-	driver.get "#{TARGET_URL}#{path}"
+	driver.get "#{CONFIG["general"]["notes_url"]}#{path}"
 	wait_for { local_url == path }
 end
 
@@ -70,13 +70,13 @@ When /^#{I}log in via openid$/ do
 	step "fill in the following fields:",
 		Cucumber::Ast::Table.new([
 			[ "name", "value" ],
-			[ "openid url", "http://localhost/~james/simpleid/identities/test.html" ]
+			[ "openid url", CONFIG["simpleid"]["identity_url"] ],
 		])
 	step "click the \"ok button\""
 
 	# first simpleid page
 
-	wait_for { simple_url == "http://localhost/~james/simpleid/www/index.php" }
+	wait_for { simple_url == CONFIG["simpleid"]["form_url"] }
 
 	field = driver.find_element :id, "edit-name"
 	field.send_keys [ :control, "a" ]
@@ -91,7 +91,7 @@ When /^#{I}log in via openid$/ do
 
 	# second simpleid page
 
-	wait_for { simple_url == "http://localhost/~james/simpleid/www/index.php" }
+	wait_for { simple_url == CONFIG["simpleid"]["form_url"] }
 
 	field = driver.find_element :id, "edit-submit"
 	field.click

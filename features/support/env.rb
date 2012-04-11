@@ -23,3 +23,15 @@ ANY_RE = /(.+)/
 
 I_HAVE = / (?: I\shave\s | I\sam\s | have\s | am\s | )?/x
 I = / (?: I\s | )?/x
+
+# load config
+
+unless File.exist? "etc/cucumber.config"
+	$stderr.puts "Error: Please create etc/cucumber.config"
+	exit 1
+end
+require "yaml"
+config_text = File.read "etc/cucumber.config"
+config_text.gsub! /\t/, " "
+CONFIG = YAML.load config_text
+pp CONFIG

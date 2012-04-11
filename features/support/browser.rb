@@ -19,8 +19,6 @@
 require "rspec/expectations"
 require "selenium-webdriver"
 
-TARGET_URL = "http://localhost:8000"
-
 DEFAULT_TIMEOUT = 5
 DEFAULT_INTERVAL = 0.5
 
@@ -39,7 +37,8 @@ def simple_url
 end
 
 def local_url
-	unless simple_url =~ /^#{Regexp.quote TARGET_URL}(\/.*)$/
+	notes_url_quoted = Regexp.quote CONFIG["general"]["notes_url"]
+	unless simple_url =~ /^#{notes_url_quoted}(\/.*)$/
 		raise "Not a local url: #{simple_url}"
 	end
 	return $1
@@ -85,7 +84,7 @@ def driver
 
 	unless $the_driver
 
-		driver_type = (ENV["DRIVER_TYPE"] || "chrome").to_sym
+		driver_type = CONFIG["selenium"]["driver"].to_sym
 
 		case driver_type
 
@@ -96,7 +95,7 @@ def driver
 				$the_driver =
 					Selenium::WebDriver.for(
 						:remote,
-						:url => "http://localhost:4444/wd/hub",
+						:url => CONFIG["selenium"]["server_url"],
 						:desired_capabilities =>
 							Selenium::WebDriver::Remote::Capabilities.htmlunit(
 								:javascript_enabled => true))
@@ -116,7 +115,7 @@ def driver
 	# clear state
 
 	the_driver.manage.delete_all_cookies
-	the_driver.get "#{TARGET_URL}/test/reset"
+	the_driver.get "#{CONFIG["general"]["notes_url"]}/test/reset"
 	the_driver.get "about:blank"
 
 	# and return

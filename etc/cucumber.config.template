@@ -1,0 +1,29 @@
+---
+
+general:
+
+	# point this to a running instance to test
+
+	notes_url: http://localhost:8000
+
+selenium:
+
+	# testing options are chrome, firefox
+	# passed directly to selenium
+
+	driver: chrome
+
+	# only if using html_unit
+
+	server_url: http://localhost:4444/wd/hub
+
+simpleid:
+
+	# set up simpleid as per the instructions, create a test user, you'll need
+	# an identity file to be used internally and a html file, the url of which
+	# is your identity, and enter the details here
+
+	identity_url: http://localhost/~james/simpleid/identities/test.html
+	form_url: http://localhost/~james/simpleid/www/index.php
+	username: test
+	password: test
